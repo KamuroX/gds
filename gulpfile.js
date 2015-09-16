@@ -1,4 +1,4 @@
-var version = '1.1.0';
+var version = '1.1.0.1';
 // import dependencies
 
 var gulp = require('gulp');
@@ -300,9 +300,30 @@ var Factory = {
     return fileInfo;
   },
 
+  version: function(version) {
+    return {
+
+      objType: 'version',
+      version: version.split('.'),
+
+      get: function() {
+        return this.version.join('.');
+      },
+
+      compare: function(version, save) {
+        for (var i = 0; i < save; i++) {
+          if (version.version[i] !== this.version[i]) return false;
+        }
+        return true;
+      },
+
+    };
+  },
+
   writer: function(path) {
     return {
 
+      objType: 'writer',
       path: path,
       lines: [],
 
@@ -329,13 +350,17 @@ var Factory = {
         return this;
       },
 
-      write: function(check) {
+      write: function(check, notice) {
         if (Jsons.settings.data.lock && inArray(Jsons.settings.data.lock, this.path) && Scan.fsExist(this.path)) {
           Devel.error('Try to write a locked file "' + this.path + '"!');
           return;
         } 
         if (check && Scan.fsExist(this.path)) {
-          Devel.warn('Try to write "' + this.path + '" but it is already created!');
+          if (notice) {
+            Devel.notice('Try to write "' + this.path + '" but it is already created!');
+          } else {
+            Devel.warn('Try to write "' + this.path + '" but it is already created!');
+          }
           return;
         }
         var _lines = this.lines;
@@ -605,6 +630,18 @@ var Devel = {
     return '[' + this.current().toUpperCase() + ']';
   },
 
+  isDebug: function(type) {
+    var op = Options.get('debug');
+    return op === true || op === type;
+  },
+
+  debug: function(log, type) {
+    if (Devel.isDebug(type)) {
+      console.log('Task: ', Devel.current());
+      console.log(log);
+    }
+  },
+
   logs: function(object, depth) {
     if (Options.get('note') === false) return;
     if (depth === undefined) depth = '';
@@ -649,8 +686,11 @@ var Dummy = {
   get: function() {
     var json = Jsons.dummy.data;
 
-    if (json.version != version) {
-      Devel.warn('dummy.json(' + json.version + ') and GDS(' + version + ') have not the same version!');
+    var jsonversion = Factory.version(json.version);
+    var gulpversion = Factory.version(version);
+
+    if (!jsonversion.compare(gulpversion, Options.get('version'))) {
+      Devel.warn('The version of the json file is not certain compatible!', 'version');
     }
     var data = {
       includes: this.includes(),
@@ -789,6 +829,14 @@ var Drupal = {
     return output;
   },
 
+  getMID: function(string) {
+     return string.toLowerCase().replace(new RegExp('(\\\\s|[^a-z0-9])', 'g'), '_');
+  },
+
+  getID: function(string) {
+    return string.toLowerCase().replace(new RegExp('(\\\\s|[^a-z0-9])', 'g'), '-');
+  },
+
 };
 
 var Options = {
@@ -831,9 +879,7 @@ var Options = {
       this.options['user-' + op] = Scan.input(input[op]);
     }
 
-    if (Options.get('debug')) {
-      Devel.log(this.options);
-    }
+    Devel.debug(this.options, 'options');
   },
 
   options: {},
@@ -888,6 +934,18 @@ var Tasks = {
       description: ['boolean - show file content before jade compile for debug'],
       def: false,
     },
+    version: {
+      description: ['int - how save will the version compare', ['0 : no compare', '1 : structure', '2 : task (default)', '3 : functions', '4 : fix']],
+      def: 2,
+    },
+    save: {
+      description: ['int - error handling ' + gutil.colors.red('(not impliment)'), ['0 : low - no error will terminate (default)', '1 : medium - errors will terminate', '2 : high - warn will terminate']],
+      def: 0,
+    },
+    create: {
+      description: ['int - if true the create task will run before start the main task', ['0 : never will run (default)', '1 : run on gulp init', '2 : run always']],
+      def: 0,
+    },
   },
 
   tasks: {
@@ -899,10 +957,16 @@ var Tasks = {
 
       f: function() {
         Devel.current('dummy');
+        var jsonTasks = [];
+        if (Options.get('create') == 2) {
+          jsonTasks.push('create');
+        }
+        jsonTasks.push('dummy-index');
+        jsonTasks.push('dummy-jade');
 
         gulp.watch('gulp/jade/**/*.jade', ['dummy-jade']);
         gulp.watch('gulp/sass/*.+(scss|sass)', ['styles']);
-        gulp.watch('dummy/dummy.json', ['dummy-index', 'dummy-jade']);
+        gulp.watch('dummy/dummy.json', jsonTasks);
       },
 
       options: {},
@@ -1042,16 +1106,14 @@ var Tasks = {
                 if (Options.get('note') > 0 || Options.get('debug')) {
                   console.log(e._messageWithDetails());
                 }
-                if (Options.get('debug-stack')) {
-                  console.log(e.stack);
-                }
+                Devel.debug(e.stack, 'estack');
                 console.log();
                 Devel.scope();
               };
             }(site)))
             .pipe(insert.prepend(Dummy.insertData(data, site)));
           gdata.setMaxListeners(0);
-          if (Options.get('debug-file')) {
+          if (Options.get('debug-file') === true || Options.get('debug-file') === site) {
             gdata.pipe(intercept(function(file) {
               console.log('FILE: \n' + file.path);
               console.log('OLD CONTENT: \n' + file.contents.toString());
@@ -1150,9 +1212,7 @@ var Tasks = {
                   if (Options.get('note') > 0 || Options.get('debug')) {
                     console.log(e._messageWithDetails());
                   }
-                  if (Options.get('debug-stack')) {
-                    console.log(e.stack);
-                  }
+                  Devel.debug(e.stack, 'estack');
                   console.log();
                   Devel.scope();
                 };
@@ -1160,7 +1220,7 @@ var Tasks = {
               .pipe(insert.prepend(Drupal.prependData()))
               .pipe(insert.append('\n+' + file.info.name + '({})\n'));
 
-            if (Options.get('debug-file')) {
+            if (Options.get('debug-file') === true || Options.get('debug-file') === file.info.name) {
               gdata.pipe(intercept(function(file) {
                 console.log('FILE: \n' + file.path);
                 console.log('OLD CONTENT: \n' + file.contents.toString());
@@ -1217,9 +1277,15 @@ var Tasks = {
 
       f: function() {
         Devel.current('watch-all');
+        var jsonTasks = [];
+        if (Options.get('create') == 2) {
+          jsonTasks.push('create');
+        }
+        jsonTasks.push('dummy-index');
+        jsonTasks.push('dummy-jade');
 
         gulp.watch('gulp/sass/*.+(scss|sass)', ['styles']);
-        gulp.watch('dummy/dummy.json', ['dummy-index', 'dummy-jade']);
+        gulp.watch('dummy/dummy.json', jsonTasks);
         gulp.watch('gulp/jade/**/*.jade', ['dummy-jade', 'jade']);
       },
 
@@ -1233,20 +1299,59 @@ var Tasks = {
 
     },
 
-    test: {
+    create: {
 
       starts: function() {
-        return [];
+        return ['refresh'];
       },
 
       f: function() {
-        Devel.current('test');
+        Devel.current('create');
 
-        var w = Factory.writer('test.txt');
-        for (var i = 0; i < 10; i++) {
-          w.prepend(i + ",");
+        var dummy = Dummy.get();
+        var includes = [];
+
+        for (var site in dummy.sites) {
+          for (var region in dummy.sites[site].regions) {
+            Scan.element(dummy.sites[site].regions[region], function(element) {
+              includes.push(element);
+            });
+          }
         }
-        w.write();
+
+        Devel.debug(includes, 'includes');
+
+        for (var i = 0; i < includes.length; i++) {
+          var parts = includes[i].split('/');
+          var file = 'gulp/jade';
+
+          for (var k = 0; k < parts.length; k++) {
+            file += '/' + parts[k];
+            if (k == parts.length - 1) {
+              var writer = Factory.writer(file + '.jade');
+              var nameparts = parts[k].split('--');
+
+              writer.line('mixin ' + parts[k]);
+              writer.line('  ');
+              for (var z = 0; z < nameparts.length; z++) {
+                writer.append('.' + Drupal.getID(nameparts[z]));
+              }
+              writer.line('    | auto generated ' + parts[k]);
+              writer.write(true, true);
+            } else {
+              if (!Scan.fsExist(file)) {
+                Devel.log('Create directory "' + file + '"');
+                fs.mkdirSync(file, function(e) {
+                  if (e) {
+                    Devel.error('Don\'t can create directory "' + file + '"', 'create-dir');
+                  }
+                });
+              } else {
+                Devel.log('Exist directory "' + file + '"');
+              }
+            }
+          }
+        }
       },
 
       options: {},
@@ -1255,7 +1360,7 @@ var Tasks = {
         return {};
       },
 
-      description: ['test'],
+      description: ['scan the dummy json after templates end create them as jade files'],
 
     },
 
@@ -1279,6 +1384,11 @@ var Tasks = {
         gulp.task(task, this.tasks[task].f);
       }
     }
+
+    if (Options.get('create') >= 1) {
+      gulp.start('create');
+    }
+
     console.log('END INIT');
     console.log();
   },

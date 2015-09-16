@@ -1,8 +1,3 @@
-mixin node(data)
-  - var nodeClasses = (dummy && data.classes ? data.classes.join(' ') : '<?php print drupal_html_class($view_mode); ?> <?php print drupal_html_class($type); ?>');
-  div.node(class!=nodeClasses)
-    +php-render('$title_prefix')
-    h2
-      +php-print('$title')
-    +php-render('$title_suffix')
-    +php-render('$content')
+mixin node
+  .node
+    | auto generated node

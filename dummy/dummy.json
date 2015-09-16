@@ -1,4 +1,5 @@
 {
+  "version": "1.1.0.0",
   "scripts": [
     "jquery-1.11.3.min.js"
   ],
@@ -15,7 +16,7 @@
       "title": "Test",
       "regions": {
         "content": "node/node",
-        "sidebar": "node/node"
+        "sidebar": "node/node--test_hu--sidebar_sub"
       }
     }
   }
