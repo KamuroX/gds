@@ -1,0 +1,97 @@
+#dummy-tool {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background-color: red;
+  border: 2px solid black;
+}
+
+#dummy-tool:hover .tool-tab, #dummy-tool.look .tool-tab {
+  display: inline-block;
+}
+
+.tool-tab {
+  display: none;
+  vertical-align: top;
+}
+
+.tool-tab:hover .tool-tab-title {
+  background-color: rgb(200, 0, 0);
+}
+
+.tool-tab:hover .tool-tab-content {
+  display: inline-block;
+}
+
+.tool-toggler {
+  display: inline-block;
+}
+
+.tool-tab-content {
+  display: none;
+  position: absolute;
+  background-color: red;
+  width: 100%;
+  right: 0;
+}
+
+.tool-tab-title {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.tool-tab-title.look, .tool-tab-title.look:hover {
+  background-color: cyan !important;
+}
+
+.tool-tab + .tool-tab .tool-tab-title {
+  border-left: 1px solid black;
+}
+
+.tool-option {
+  border: 1px solid black;
+  padding: 10px;
+  cursor: pointer;
+  display: block;
+  background-color: white;
+}
+
+.tool-site-tab .tool-option {
+  padding: 0;
+}
+
+.tool-site-tab .tool-option .tool-link {
+  padding: 10px;
+}
+
+a.tool-link {
+  text-decoration: none;
+  color: black;
+  display: inline-block;
+  line-height: 20px;
+}
+
+.tool-link + .tool-link {
+  border-left: 1px solid black;
+}
+
+.tool-option + .tool-option {
+  border-top-width: 0px;
+}
+
+.tool-option:hover {
+  background-color: rgb(200, 0, 0);
+}
+
+.tool-site-tab .tool-option:hover {
+  background-color: red;
+}
+
+.tool-site-tab .tool-option .tool-link:hover {
+  background-color: rgb(200, 0, 0);
+}
+
+.tool-design-link {
+  width: 20px;
+  float: right;
+}

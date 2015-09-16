@@ -1,0 +1,13 @@
+{
+  "breakpoints": {
+    "narrowMedium": 545,
+    "mediumWide": 1025
+  },
+  "styles": {
+    "modes": [
+      "narrow",
+      "medium",
+      "wide"
+    ]
+  }
+}

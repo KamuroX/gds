@@ -1,0 +1,22 @@
+{
+  "scripts": [
+    "jquery-1.11.3.min.js"
+  ],
+  "regions": {
+    "content": [],
+    "sidebar": []
+  },
+  "design": {
+    "format": "png"
+  },
+  "sites": {
+    "example-news": {
+      "classes": ["node-type-news", "front"],
+      "title": "Test",
+      "regions": {
+        "content": "node/node",
+        "sidebar": "node/node"
+      }
+    }
+  }
+}

@@ -1,0 +1,57 @@
+- var narrowMedium = 545;
+- var mediumWide = 1025;
+
+mixin php-foreach(expr)
+  if drupal
+    | <?php foreach(!{expr}): ?>
+    block
+    | <?php endforeach; ?>
+
+mixin php-print(expr)
+  if drupal
+    | <?php print !{expr}; ?>
+
+mixin php-t(expr)
+  if drupal
+    | <?php print t('!{expr}'); ?>
+
+mixin php-if(expr)
+  if drupal
+    | <?php if(!{expr}): ?>
+    block
+    | <?php endif; ?>
+
+mixin php-isset(expr)
+  if drupal
+    | <?php if(isset(!{expr}) && !{expr}): ?>
+    block
+    | <?php endif; ?>
+
+mixin php-module-exists(expr)
+  if drupal
+    | <?php if(module_exists(!{expr})): ?>
+    block
+    | <?php endif; ?>
+
+mixin php-for(expr)
+  if drupal
+    | <?php for(!{expr}): ?>
+    block
+    | <?php endfor; ?>
+
+mixin php-render(expr)
+  if drupal
+    | <?php print render(!{expr}); ?>
+
+mixin php(expr)
+  if drupal
+    | <?php !{expr}; ?>
+
+mixin php-print-if-set(expr)
+  if drupal
+    - var condition = 'isset(' + expr + ')';
+    +php-if(condition)
+      +php-print(expr)
+
+mixin space()
+  | !{' '}

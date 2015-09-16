@@ -1,0 +1,17 @@
+mixin page
+  #page
+    +isRegion('header')
+      #header
+        +region('header')
+    #main
+      #content
+        h1.title
+          +pageTitle
+          +php-print('$title')
+        +region('content')
+      +isRegion('sidebar')
+        #sidebar
+          +region('sidebar')
+    +isRegion('footer')
+      #footer
+        +region('footer')

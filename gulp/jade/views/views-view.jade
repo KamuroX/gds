@@ -1,0 +1,36 @@
+mixin views-view  
+  +php-render('$title_prefix')
+  +php-if('$title')
+    +php-print('$title')
+  +php-render('$title_suffix')
+
+  +php-if('$header')
+    +php-print('$header')
+
+  +php-if('$exposed')
+    +php-print('$exposed')
+
+  +php-if('$attachment_before')
+    +php-print('$attachment_before')
+
+  +php-if('$rows')
+    +php-print('$rows')
+
+  +php-if('isset($empty)')
+    +php-print('$empty')
+
+  +php-if('$pager')
+    +php-print('$pager')
+
+  +php-if('$attachment_after')
+    +php-print('$attachment_after')
+
+  +php-if('$more')
+    +php-print('$more')
+
+  +php-if('$footer')
+    +php-print('$footer')
+
+  +php-if('$feed_icon')
+    +php-print('$feed_icon')
+

@@ -1,0 +1,7 @@
+mixin block
+  +php-if('$block->subject')
+    h2
+      +php-print('$block->subject')
+
+  +php-print('$content')
+

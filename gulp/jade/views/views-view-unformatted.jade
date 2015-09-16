@@ -1,0 +1,4 @@
+mixin views-view-unformatted 
+  +php-if('!empty($title)'): h2: +php-print('$title')
+
+  +php-foreach('$rows as $id => $row'): +php-print('$row')

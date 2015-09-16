@@ -1,0 +1,27 @@
+#header {
+  height: 100px;
+  border: 2px solid cyan;
+  padding: 20px;
+  margin-bottom: 30px; }
+
+#content {
+  width: 70%;
+  box-sizing: border-box;
+  padding: 20px;
+  border: 2px solid red;
+  min-height: 400px;
+  display: inline-block;
+  vertical-align: top; }
+
+#sidebar {
+  display: inline-block;
+  width: 30%;
+  padding: 20px;
+  box-sizing: border-box;
+  border: 2px solid green;
+  vertical-align: top; }
+
+.teaser {
+  border: 2px solid orange;
+  box-sizing: border-box;
+  padding: 20px; }

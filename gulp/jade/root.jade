@@ -1,0 +1,182 @@
+//------------------------------------------------------------------------------------------------------//
+//- variables difinitions -//
+//------------------------------------------------------------------------------------------------------//
+
+//- the save var for in(scope) functions
+- var tmp = {scope: {}, data: {}};
+- var dummy = vars.dummy;
+- var drupal = vars.drupal;
+
+//------------------------------------------------------------------------------------------------------//
+//- helper function difinitions -//
+//------------------------------------------------------------------------------------------------------//
+
+//- copy an array
+- var copyArray = function(array) {
+-   var newArray = [];
+-   for (var index in array) {
+-     newArray[index] = array[index];
+-   }
+-   return newArray;
+- }
+
+//- shuffle an array and copy it before
+- var shuffle = function(array, copy) {
+-   if (copy) array = copyArray(array);
+-   for(var j, x, i = array.length; i; j = Math.floor(Math.random() * i), x = array[--i], array[i] = array[j], array[j] = x);
+-   return array;
+- }
+
+- var isArray = function(object) {
+-   return Object.prototype.toString.call(object) == '[object Array]'
+- }
+
+- var isObject = function(object) {
+-   return typeof object == 'object'
+- }
+
+- var isString = function(object) {
+-   return typeof object == 'string'
+- }
+
+//------------------------------------------------------------------------------------------------------//
+//- data difinitions -//
+//------------------------------------------------------------------------------------------------------//
+
+//- get the string to include a mixin from include path
+//- e.g. include-path 'node/node' -> mixin 'node' -> return 'node'
+- var getInclude = function(string) {
+-   string = string.split('/');
+-   return string[string.length - 1];
+- }
+
+//------------------------------------------------------------------------------------------------------//
+//- in (scope) definitions -//
+//------------------------------------------------------------------------------------------------------//
+
+//- set the scope for all in(scope) functions
+//- default is (region + include mixin)
+//- e.g. for mixin node--news--full in region content the scope is 'content-node--news--full'
+mixin inScope(scope)
+  - var old = tmp.scope.scope;
+  - tmp.scope.scope = scope;
+  block
+  - tmp.scope.scope = old;
+
+//- in(scope) function
+//- provide the tmp scope
+- var inProvide = function() {
+-   return (tmp.data[tmp.scope.scope] = tmp.data[tmp.scope.scope] || {});
+- }
+
+//- in(scope) function
+//- get a in(scope) variable or the fallback(def)
+- var inGet = function(name, def) {
+-   var indata = inProvide();
+-   return (indata[name] = indata[name] || def);
+- }
+
+//- in(scope) function
+//- set a in(scope) variable
+- var inSet = function(name, set) {
+-   var indata = inProvide();
+-   return (indata[name] = set);
+- }
+
+//- in(scope) function
+//- count in(scope) with the amount(default: 1) as step and start(default: 0) as startpoint
+- var inCount = function(amount, start) {
+-   var c = inGet('f-count', 0);
+-   amount = amount || 1;
+-   start = start || 0;
+-   inSet('f-count', c + amount);
+-   return c + start;
+- }
+
+//------------------------------------------------------------------------------------------------------//
+//- page definitions -//
+//------------------------------------------------------------------------------------------------------//
+
+//- render the page content
+mixin pageContent
+  if dummy
+    +invoke(vars.site.page)
+
+//- insert the page scripts
+//- (tmp-bug: only dummy js)
+mixin pageScripts
+  if dummy
+    script var vars = !{JSON.stringify(vars)}
+    - for (var index in vars.scripts) {
+      script(src=vars.scripts[index])
+    - }
+
+mixin pageTitle
+  if dummy
+    | #{vars.site.title}
+
+//- render a region
+mixin region(region)
+  if dummy
+    - tmp.scope.region = region;
+    +element(vars.regions[region])
+  +php-render("$page['" + region + "']")
+
+mixin isRegion(region)
+  if dummy && vars.regions[region]
+    block
+  +php-if("$page['" + region + "']")
+    block
+
+//------------------------------------------------------------------------------------------------------//
+//- render definitions -//
+//------------------------------------------------------------------------------------------------------//
+
+//- invoke an include path as mixin with data
+mixin invoke(include, data)
+  - data = data || {};
+  - include = getInclude(include);
+  - tmp.scope.invoke = include;
+  +inScope(data.scope || tmp.scope.region + '-' + tmp.scope.invoke)
+    +#{include}(data)
+
+//- render recursive an object definitions
+mixin element(object, data)
+  if isArray(object)
+    for item in object
+      +element(item, data)
+  if isObject(object)
+    - var loop = object.loop || 1;
+    - for (var i = 0; i < loop; i++)
+      +element(object.items, object)
+  if isString(object)
+    +invoke(object, data)
+
+//------------------------------------------------------------------------------------------------------//
+//- field definitions -//
+//------------------------------------------------------------------------------------------------------//
+
+//- no function
+mixin field(field)
+  +#{field.type}(field)
+
+//- no function
+mixin field-image(path, delta, width, height)
+  if isObject(path)
+    - var p = path.path;
+    - var items = path.items || 1;
+    - var width = path.width || undefined;
+    - var height = path.height || undefined;
+    - for (var i = 0; i < items; i++)
+      img(src=vars.source.images[p][i % vars.source.images[p].length], width=width, height=height)
+  else
+    img(src=vars.source.images[path][delta], width=width, height=height)
+
+
+//------------------------------------------------------------------------------------------------------//
+//- init dummy system do not write anything below -//
+//------------------------------------------------------------------------------------------------------//
+
+//- invoke the system
+if dummy
+  +invoke(vars.site.html)

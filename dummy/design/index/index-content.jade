@@ -1,0 +1,20 @@
+.wrapper
+  .item-title
+    h2
+      | #{contentTitle}
+  .content
+    .wide.item(class=wideClass)
+      a(href=contentLink)
+        img(src=wideImage)
+        h2
+          | #{contentTitle} - wide
+    .medium.item(class=mediumClass)
+      a(href=contentLink)
+        img(src=mediumImage)
+        h2
+          | #{contentTitle} - medium
+    .narrow.item(class=narrowClass)
+      a(href=contentLink)
+        img(src=narrowImage)
+        h2
+          | #{contentTitle} - narrow

@@ -1,0 +1,26 @@
+mixin html
+  - var classes = dummy ? vars.site.classes.join(' ') : "<?php print $classes; ?>";
+  - var lang = dummy ? vars.site.lang : "<?php print $language->language; ?>";
+  - var dir = dummy ? vars.site.dir : "<?php print $language->dir; ?>";
+  doctype html
+  html(xmlns="http://www.w3.org/1999/xhtml", xml:lang=lang, version="XHTML+RDFa 1.0" dir=dir)
+    head
+      title
+        +pageTitle
+        +php-print('$head_title')
+      +php-print('$styles')
+
+      +php-print('$scripts')
+      +pageScripts
+      if dummy
+        script(type="text/javascript", src="../../scripts/DZResponsive.js")
+        script(type="text/javascript", src="../../scripts/test_theme.js")
+        link(type="text/css", rel="stylesheet", href="dummy.css")
+        link.narrow-style(type="text/css", rel="stylesheet", href="../../styles/narrow.css", media="all and (max-width: 550px)")
+        link.medium-style(type="text/css", rel="stylesheet", href="../../styles/medium.css", media="all and (min-width: 551px) and (max-width: 1024px)")
+        link.wide-style(type="text/css", rel="stylesheet", href="../../styles/wide.css", media="all and (min-width: 1025px)")
+    body(class=classes)
+      +pageContent
+      +php-print('$page_top')
+      +php-print('$page')
+      +php-print('$page_bottom')

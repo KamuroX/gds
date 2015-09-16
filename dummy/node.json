@@ -1,0 +1,46 @@
+{
+  "image-styles": {
+    "news-full": {
+      "width": 500,
+      "height": 200
+    },
+    "news-teaser": {
+      "width": 100,
+      "height": 100
+    }
+  },
+  "fields": {
+    "title": {
+      "type": "text",
+      "words": 3
+    },
+    "images": {
+      "type": "image",
+      "amount": "unlimited"
+    },
+    "link": {
+      "type": "link",
+      "link": "www.google.com",
+      "text": "read more"
+    },
+    "reference": {
+      "type": "reference",
+      "bundles": ["news"]
+    }
+  },
+  "nodes": {
+    "news": {
+      "full": {
+        "images": {
+          "style": "news-full"
+        }
+      },
+      "teaser": {
+        "images": {
+          "index": 1,
+          "style": "news-teaser"
+        }
+      }
+    }
+  }
+}

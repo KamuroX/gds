@@ -1,0 +1,66 @@
+name = test
+description = No Description
+core = 7.x
+package = LOOM
+base theme = reset
+
+
+
+; Theme settings
+
+settings[breadcrumb] = 0
+settings[feed_icon] = 0
+
+; / Theme settings
+
+
+
+; Theme regions
+
+; header
+regions[header] = Header
+; regions[header_top] = Header top
+; regions[header_bottom] = Header bottom
+
+; Content
+; regions[pre_content] = Pre content
+regions[content] = Content
+regions[sidebar_first] = Sidebar first
+; regions[sidebar_second] = Sidebar second
+
+; footer
+regions[footer] = Footer
+; regions[footer_top] =  Footer top
+; regions[footer_bottom] =  Footer bottom
+
+; / Theme regions
+
+
+
+; Embed stylesheets
+
+stylesheets[screen and (max-width: 550px)][] = css/narrow.css
+stylesheets[screen and (min-width: 551px) and (max-width: 1024px)][] = css/medium.css
+stylesheets[screen and (min-width: 1025px)][] = css/wide.css
+
+; / Embed stylesheets
+
+
+
+; Remove system css
+
+stylesheets[all][] = fakepath/base.css
+stylesheets[all][] = fakepath/jquery.ui.accordion.css
+stylesheets[all][] = fakepath/jquery.ui.theme.css
+stylesheets[all][] = fakepath/jquery.ui.core.css
+
+; / Remove system css
+
+
+
+; Embed JS scripts
+
+scripts[] = scripts/DZResponsive.js
+scripts[] = scripts/test_theme.js
+
+; / Embed JS scripts
