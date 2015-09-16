@@ -1,4 +1,4 @@
-var version = '1.1.0.1';
+var version = '1.1.1.0';
 // import dependencies
 
 var gulp = require('gulp');
