@@ -713,7 +713,6 @@ var Dummy = {
       });
     }
     for (var site in json.sites) {
-      data.sites[site].current = site;
       data.sites[site].tools = tools;
     }
     return data;
@@ -792,6 +791,7 @@ var Dummy = {
     data.sites[site].scripts = data.scripts;
     data.sites[site].drupal = false;
     data.sites[site].dummy = true;
+    data.sites[site].version = version;
     output += '- var vars = ' + JSON.stringify(data.sites[site]) + ';\n';
     return output;
   },

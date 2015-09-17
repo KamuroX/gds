@@ -1,8 +1,28 @@
+var version = '1.1.1.0';
+
 if (Drupal === undefined) {
   var Drupal = {
     settings: {},
     behaviors: {},
   };
+}
+
+function copyArray(array) {
+  var newArray = [];
+
+  for (var index in array) {
+    newArray[index] = array[index];
+  }
+  return newArray;
+}
+
+function copyObject(object) {
+  var newObject = {};
+
+  for (var field in object) {
+    newObject[field] = object[field];
+  }
+  return newObject;
 }
 
 (function($) {
@@ -11,12 +31,24 @@ if (Drupal === undefined) {
     for (var index in Drupal.behaviors) {
       Drupal.behaviors[index].attach(document, Drupal.settings);
     }
-    initDummyTools();
+    initDummyTools($);
   });
 }(jQuery));
 
-function initDummyTools() {
-  console.log('init dummy tools');
+function dummyVersionTest() {
+  var v1 = version.split('.');
+  var v2 = vars.version.split('.');
+
+  if (v1[0] !== v2[0]) {
+    console.warn('The version of the js file is not certain compatible with the gulpfile structur (' + vars.version + ')!');
+  }
+}
+
+function initDummyTools($) {
+  console.log('INIT GDS TOOLS (' + version + ')');
+  dummyVersionTest();
+
+  initDummyPagerTool($);
   var tool = $('<div id="dummy-tool"></div>');
   var mediaTab = $('<div class="tool-media-tab tool-tab"></div>');
   var siteTab = $('<div class="tool-site-tab tool-tab"><div>');
@@ -129,16 +161,17 @@ function dummyToolMediaTab(mediaTab) {
 function dummyToolSiteTab(siteTab) {
   siteTab.append($('<div class="tool-tab-title">' + dummyToolGetCurrentSite().title + '</div>'));
   var content = $('<div class="tool-tab-content"></div>');
+  var tools = copyArray(vars.tools);
 
-  vars.tools.sites.unshift({
+  tools.unshift({
     name: 'index',
     title: 'Index',
   });
-  for (var index in vars.tools.sites) {
+  for (var index in tools) {
     var option = $('<div class="tool-option"></div>');
 
-    option.append($('<a href="' + vars.tools.sites[index].name + '.html" class="tool-site-link tool-link">' + vars.tools.sites[index].title + '</a>'));
-    option.append($('<a href="#" class="tool-design-link tool-link" target="_blank" data-name="' + vars.tools.sites[index].name + '">-></a>'));
+    option.append($('<a href="' + tools[index].name + '.html" class="tool-site-link tool-link">' + tools[index].title + '</a>'));
+    option.append($('<a href="#" class="tool-design-link tool-link" target="_blank" data-name="' + tools[index].name + '">-></a>'));
     content.append(option);
   }
 
@@ -146,10 +179,55 @@ function dummyToolSiteTab(siteTab) {
 }
 
 function dummyToolGetCurrentSite() {
-  for (var index in vars.tools.sites) {
-    if (vars.tools.current == vars.tools.sites[index].name) {
-      return vars.tools.sites[index];
+  for (var index in vars.tools) {
+    if (vars.site.name == vars.tools[index].name) {
+      return vars.tools[index];
     }
   }
   return undefined;
+}
+
+function dummyPagerGetElements() {
+  var pager = {
+    prev: undefined,
+    next: undefined,
+  };
+  for (var i = 0; i < vars.tools.length; i++) {
+    if (vars.site.name == vars.tools[i].name) {
+      if (i == 0) {
+        pager.prev = vars.tools.length - 1;
+      } else {
+        pager.prev = i - 1;
+      }
+      if (i == vars.tools.length - 1) {
+        pager.next = 0;
+      } else {
+        pager.next = i + 1;
+      }
+    }
+  }
+  return pager;
+}
+
+function dummyPagerGoto(index) {
+  var locations = window.location.href.split('/');
+
+  locations[locations.length - 1] = vars.tools[index].name;
+  window.location.href = locations.join('/') + '.html';
+}
+
+function initDummyPagerTool($) {
+  var pager = dummyPagerGetElements();
+  $(document).keydown(function(key) {
+    switch (parseInt(key.which, 10)) {
+      // Left arrow key pressed
+      case 37:
+        dummyPagerGoto(pager.prev);
+        break;
+      // Right Arrow Pressed
+      case 39:
+        dummyPagerGoto(pager.next);
+        break;
+    }
+  });
 }
