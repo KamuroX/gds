@@ -11,11 +11,11 @@ if (Drupal === undefined) {
     for (var index in Drupal.behaviors) {
       Drupal.behaviors[index].attach(document, Drupal.settings);
     }
-    initDummyTools();
+    initDummyTools($);
   });
 }(jQuery));
 
-function initDummyTools() {
+function initDummyTools($) {
   console.log('init dummy tools');
   var tool = $('<div id="dummy-tool"></div>');
   var mediaTab = $('<div class="tool-media-tab tool-tab"></div>');
@@ -49,6 +49,7 @@ function initDummyTools() {
       media: $('.' + modes[index] + '-style').attr('media'),
     }
   }
+  initDummyPagerTool($);
 }
 
 function dummyToolResponsive(mode, options) {
@@ -130,15 +131,15 @@ function dummyToolSiteTab(siteTab) {
   siteTab.append($('<div class="tool-tab-title">' + dummyToolGetCurrentSite().title + '</div>'));
   var content = $('<div class="tool-tab-content"></div>');
 
-  vars.tools.sites.unshift({
+  vars.tools.unshift({
     name: 'index',
     title: 'Index',
   });
-  for (var index in vars.tools.sites) {
+  for (var index in vars.tools) {
     var option = $('<div class="tool-option"></div>');
 
-    option.append($('<a href="' + vars.tools.sites[index].name + '.html" class="tool-site-link tool-link">' + vars.tools.sites[index].title + '</a>'));
-    option.append($('<a href="#" class="tool-design-link tool-link" target="_blank" data-name="' + vars.tools.sites[index].name + '">-></a>'));
+    option.append($('<a href="' + vars.tools[index].name + '.html" class="tool-site-link tool-link">' + vars.tools[index].title + '</a>'));
+    option.append($('<a href="#" class="tool-design-link tool-link" target="_blank" data-name="' + vars.tools[index].name + '">-></a>'));
     content.append(option);
   }
 
@@ -146,10 +147,25 @@ function dummyToolSiteTab(siteTab) {
 }
 
 function dummyToolGetCurrentSite() {
-  for (var index in vars.tools.sites) {
-    if (vars.tools.current == vars.tools.sites[index].name) {
-      return vars.tools.sites[index];
+  for (var index in vars.tools) {
+    if (vars.current == vars.tools[index].name) {
+      return vars.tools[index];
     }
   }
   return undefined;
+}
+
+function initDummyPagerTool($) {
+  $(document).keydown(function(key) {
+    switch (parseInt(key.which, 10)) {
+      // Left arrow key pressed
+      case 37:
+
+        break;
+      // Right Arrow Pressed
+      case 39:
+
+        break;
+    }
+  });
 }
