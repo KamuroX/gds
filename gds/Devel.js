@@ -1,8 +1,17 @@
+module.parent.exports.Devel = {
 
-module.exports = {
+  options: undefined,
 
-  that: function() {
-    console.log(this);
+  init: function() {
+    this.options = module.parent.exports.Options;
+  },
+
+  test: function() {
+    this.options.op('hallo');
+  },
+
+  de: function(p) {
+    console.log(p, 'de');
   },
 
 };

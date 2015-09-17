@@ -681,11 +681,8 @@ var Devel = {
 
 };
 
-module.test = {
-  main: true,
-};
-
-var test = require('./gds/main');
+var test = require('./gds/Plugins');
+test.Devel.test();
 
 var Dummy = {
 
