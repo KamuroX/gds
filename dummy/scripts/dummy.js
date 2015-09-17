@@ -1,3 +1,5 @@
+var version = '1.1.1.0';
+
 if (Drupal === undefined) {
   var Drupal = {
     settings: {},
@@ -33,8 +35,19 @@ function copyObject(object) {
   });
 }(jQuery));
 
+function dummyVersionTest() {
+  var v1 = version.split('.');
+  var v2 = vars.version.split('.');
+
+  if (v1[0] !== v2[0]) {
+    console.warn('The version of the js file is not certain compatible with the gulpfile structur (' + vars.version + ')!');
+  }
+}
+
 function initDummyTools($) {
-  console.log('init dummy tools');
+  console.log('INIT GDS TOOLS (' + version + ')');
+  dummyVersionTest();
+
   initDummyPagerTool($);
   var tool = $('<div id="dummy-tool"></div>');
   var mediaTab = $('<div class="tool-media-tab tool-tab"></div>');
@@ -167,7 +180,7 @@ function dummyToolSiteTab(siteTab) {
 
 function dummyToolGetCurrentSite() {
   for (var index in vars.tools) {
-    if (vars.current == vars.tools[index].name) {
+    if (vars.site.name == vars.tools[index].name) {
       return vars.tools[index];
     }
   }
