@@ -18,6 +18,13 @@
         "content": "node/node",
         "sidebar": "node/node--test_hu--sidebar_sub"
       }
+    },
+    "example-news-test": {
+      "classes": ["node-type-news", "front"],
+      "regions": {
+        "content": "node/node",
+        "sidebar": "node/node--test--cool"
+      }
     }
   }
 }
