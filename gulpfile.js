@@ -354,7 +354,7 @@ var Factory = {
         if (Jsons.settings.data.lock && inArray(Jsons.settings.data.lock, this.path) && Scan.fsExist(this.path)) {
           Devel.error('Try to write a locked file "' + this.path + '"!');
           return;
-        } 
+        }
         if (check && Scan.fsExist(this.path)) {
           if (notice) {
             Devel.notice('Try to write "' + this.path + '" but it is already created!');
@@ -373,7 +373,7 @@ var Factory = {
           }
 
           Devel.notice('File "' + _path + '" are saved');
-        }); 
+        });
       },
 
     };
@@ -1340,14 +1340,14 @@ var Tasks = {
               writer.write(true, true);
             } else {
               if (!Scan.fsExist(file)) {
-                Devel.log('Create directory "' + file + '"');
+                Devel.notice('Create directory "' + file + '"');
                 fs.mkdirSync(file, function(e) {
                   if (e) {
                     Devel.error('Don\'t can create directory "' + file + '"', 'create-dir');
                   }
                 });
               } else {
-                Devel.log('Exist directory "' + file + '"');
+                Devel.notice('Exist directory "' + file + '"');
               }
             }
           }
