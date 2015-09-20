@@ -1,27 +1,44 @@
-var plugins = require('fs').readdirSync('./gds');
-var gutil = require('gulp-util').colors;
+var fs = require('fs');
+var colors = require('gulp-util').colors;
 
-for (var plugin in plugins) {
-  if (plugins[plugin] !== 'Plugins.js') {
-    require('./' + plugins[plugin]);
-  }
-}
+module.exports.base = require('./base');
+var base = module.exports.base;
 
-for (var plugin in module.exports) {
-  if (module.exports[plugin].dependencies !== undefined) {
-    var dependencies = module.exports[plugin].dependencies();
+function checkDependencies() {
+  for (var plugin in module.exports.plugins) {
+    if (base.isset(module.exports.plugins[plugin].dependencies)) {
+      var dependencies = module.exports.plugins[plugin].dependencies();
 
-    for (var dependency in dependencies) {
-      if (module.exports[dependencies[dependency]] === undefined) {
-        console.warn(gutil.yellow('Don\'t load "' + plugin + '" plugin cause by missing dependent plugin "' + dependencies[dependency] + '"'));
-        delete module.exports[plugin];
-        break;
-      } else {
-        module.exports[plugin][dependencies[dependency]] = module.exports[dependencies[dependency]];
+      for (var dependency in dependencies) {
+        if (!base.isset(module.exports.plugins[dependencies[dependency]])) {
+          console.log(colors.yellow('Don\'t load "' + plugin + '" plugin cause by missing dependent plugin "' + dependencies[dependency] + '"'));
+          delete module.exports.plugins[plugin];
+          checkDependencies(); // check all dependencies again
+        } else {
+          module.exports.plugins[plugin][dependencies[dependency]] = module.exports.plugins[dependencies[dependency]];
+        }
       }
     }
-    if (module.exports[plugin] !== undefined && module.exports[plugin].init !== undefined) {
-      module.exports[plugin].init();
+  }
+}
+
+function initPlugins() {
+  for (var plugin in module.exports.plugins) {
+    module.exports.plugins[plugin] = base.merge(module.exports.plugins[plugin], base, true);
+    if (base.isset(module.exports.plugins[plugin].init)) {
+      module.exports.plugins[plugin].init();
     }
   }
 }
+
+
+
+var plugins = fs.readdirSync('./gds/plugins');
+var tasks = fs.readdirSync('./gds/tasks');
+
+for (var plugin in plugins) {
+  require('./plugins/' + plugins[plugin]);
+}
+
+checkDependencies();
+initPlugins();

@@ -107,9 +107,12 @@ mixin pageContent
 mixin pageScripts
   if dummy
     script var vars = !{JSON.stringify(vars)}
-    - for (var index in vars.scripts) {
-      script(src=vars.scripts[index])
+    - for (var index in vars.scripts.dummy) {
+      script(src=vars.scripts.dummy[index])
     - }
+  - for (var index in vars.scripts.drupal) {
+    script(src=vars.scripts.drupal[index])
+  - }
 
 mixin pageTitle
   if dummy

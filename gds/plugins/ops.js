@@ -1,4 +1,4 @@
-module.parent.exports.ops = {
+module.parent.plugins.ops = {
 
   dependencies: function() {
     return [

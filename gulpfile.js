@@ -682,7 +682,6 @@ var Devel = {
 };
 
 var test = require('./gds/Plugins');
-test.Devel.test();
 
 var Dummy = {
 
@@ -762,24 +761,37 @@ var Dummy = {
 
   scripts: function(json) {
     json.scripts = json.scripts || [];
-    var scripts = {};
-    var dependScripts = [];
-    var scriptsFiles = Scan.dir('dummy/scripts', Options.get('scan-scripts'));
+    var scripts = {
+      dummy: {},
+      drupal: {},
+    };
+    var dependScripts = {
+      dummy: [],
+      drupal: [],
+    };
 
-    Scan.walkFile(scriptsFiles, function(file, path) {
+    Scan.walkFile(Scan.dir('dummy/scripts', Options.get('scan-scripts')), function(file, path) {
       if (file.info.extend && file.info.extend == 'js') {
-        scripts[file.name] = ('..' + (path + '/' + file.name).substring('/dummy'.length));
+        scripts.dummy[file.name] = ('..' + (path + '/' + file.name).substring('/dummy'.length));
       }
     });
 
-    for (var index = 0; index < json.scripts.length; index++) {
-      if (scripts[json.scripts[index]] !== undefined) {
-        dependScripts.push(scripts[json.scripts[index]]);
+    Scan.walkFile(Scan.dir('scripts', Options.get('scan-scripts')), function(file, path) {
+      if (file.info.extend && file.info.extend == 'js') {
+        scripts.drupal[file.name] = ('..' + (path + '/' + file.name).substring('/dummy'.length));
       }
-    }
-    for (var index in scripts) {
-      if (!inArray(json.scripts, index)) {
-        dependScripts.push(scripts[index]);
+    });
+
+    for (var scope in scripts) {
+      for (var index = 0; index < json.scripts.length; index++) {
+        if (scripts[scope][json.scripts[index]] !== undefined) {
+          dependScripts[scope].push(scripts[scope][json.scripts[index]]);
+        }
+      }
+      for (var index in scripts[scope]) {
+        if (!inArray(json.scripts, index)) {
+          dependScripts[scope].push(scripts[scope][index]);
+        }
       }
     }
     return dependScripts;
