@@ -1,5 +1,17 @@
 var base = require('./base');
 var fs = require('fs');
+var colors = require('gulp-util').colors;
+
+var extendPlugins = {
+  gulp: 'gulp',
+  plumber: 'gulp-plumber',
+  insert: 'gulp-insert',
+  intercept: 'gulp-intercept',
+  jade: 'gulp-jade',
+  rename: 'gulp-rename',
+  sass: 'gulp-sass',
+  autoprefixer: 'gulp-autoprefixer',
+};
 
 module.exports.base = base;
 
@@ -44,8 +56,17 @@ var jsons = {
 
 module.exports.jsons = {};
 
+
+module.exports.loadJson = function(name, reload) {
+  if (reload) {
+    delete require.cache[require.resolve(name)];
+  }
+  return (module.exports.jsons[name] = (fs.existsSync(jsons[name]) ? require(jsons[name]) : undefined));
+};
+
+// init jsons
 for (var name in jsons) {
-  module.exports.jsons[field] = (fs.existsSync(jsons[name]) ? require(jsons[name]) : undefined);
+  module.exports.loadJson(name);
 }
 
 
@@ -58,7 +79,15 @@ for (var plugin in plugins) {
 }
 
 module.exports.plugins.fs = fs;
-module.exports.plugins.colors = require('gulp-util').colors;
+module.exports.plugins.colors = colors;
+
+for (var extPlugin in extendPlugins) {
+  module.exports.plugins[extPlugin] = require(extendPlugins[extPlugin]);
+}
+
+for (var task in tasks) {
+  module.exports.tasks[task.split('.')[0]] = require('./tasks/' + tasks[task]);
+}
 
 checkDependencies();
 initPlugins();
