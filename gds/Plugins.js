@@ -1,8 +1,9 @@
+var base = require('./base');
 var fs = require('fs');
-var colors = require('gulp-util').colors;
 
-module.exports.base = require('./base');
-var base = module.exports.base;
+module.exports.base = base;
+
+
 
 function checkDependencies() {
   for (var plugin in module.exports.plugins) {
@@ -24,11 +25,27 @@ function checkDependencies() {
 
 function initPlugins() {
   for (var plugin in module.exports.plugins) {
-    module.exports.plugins[plugin] = base.merge(module.exports.plugins[plugin], base, true);
+    if (module.exports.plugins[plugin].baseMerge) {
+      module.exports.plugins[plugin] = base.merge(module.exports.plugins[plugin], base, true);
+    }
     if (base.isset(module.exports.plugins[plugin].init)) {
       module.exports.plugins[plugin].init();
     }
   }
+}
+
+
+
+var jsons = {
+  dummy: 'dummy/dummy.json',
+  settings: 'settings.json',
+  local: 'local.json',
+};
+
+module.exports.jsons = {};
+
+for (var name in jsons) {
+  module.exports.jsons[field] = (fs.existsSync(jsons[name]) ? require(jsons[name]) : undefined);
 }
 
 
@@ -39,6 +56,9 @@ var tasks = fs.readdirSync('./gds/tasks');
 for (var plugin in plugins) {
   require('./plugins/' + plugins[plugin]);
 }
+
+module.exports.plugins.fs = fs;
+module.exports.plugins.colors = require('gulp-util').colors;
 
 checkDependencies();
 initPlugins();

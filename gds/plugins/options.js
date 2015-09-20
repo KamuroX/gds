@@ -1,25 +1,26 @@
-module.parent.plugins.ops = {
+var argv = require('yargs').argv;
+
+var plugin = (module.parent.exports.plugins.options = {
+
+  baseMerge = true,
 
   dependencies: function() {
     return [
-      'jsons',
-      'scan',
       'tasks',
       'devel',
     ];
   },
 
   init: function() {
-    Jsons.init();
-    var input = copyObject(argv);
+    var input = this.copy(argv);
     var local = {};
     var def = {};
 
     delete input['_'];
     delete input['$0'];
 
-    if (Jsons.local.exist) {
-      local = Jsons.local.data.options;
+    if (isset(module.parent.exports.jsons.local)) {
+      local = module.parent.exports.jsons.local.options;
     }
 
     for (var task in Tasks.tasks) {
@@ -28,37 +29,37 @@ module.parent.plugins.ops = {
 
     for (var task in def) {
       for (var op in def[task]) {
-        this.options[task + '-' + op] = Scan.input(def[task][op]);
+        this.options[task + '-' + op] = this.input(def[task][op]);
       }
     }
     for (var global in Tasks.globals) {
       this.options[global] = Tasks.globals[global].def;
     }
     for (var task in local) {
-      if (isObject(local[task])) {
+      if (this.isObject(local[task])) {
         for (var op in local[task]) {
-          this.options['local-' + task + '-' + op] = Scan.input(local[task][op]);
+          this.options['local-' + task + '-' + op] = this.input(local[task][op]);
         }
       } else {
-        this.options['local-' + task] = Scan.input(local[task]);
+        this.options['local-' + task] = this.input(local[task]);
       }
     }
     for (var op in input) {
-      this.options['user-' + op] = Scan.input(input[op]);
+      this.options['user-' + op] = this.input(input[op]);
     }
 
-    Devel.debug(this.options, 'options');
+    this.devel.debug(this.options, 'options');
   },
 
   options: {},
 
   searchings: function(name) {
     return [
-      'user-' + Devel.current() + '-' + name,
+      'user-' + this.devel.current() + '-' + name,
       'user-' + name,
-      'local-' + Devel.current() + '-' + name,
+      'local-' + this.devel.current() + '-' + name,
       'local-' + name,
-      Devel.current() + '-' + name,
+      this.devel.current() + '-' + name,
       name,
     ];
   },
@@ -85,4 +86,11 @@ module.parent.plugins.ops = {
     return false;
   },
 
-};
+  input: function(object) {
+    if (this.isString(object)) {
+      object = object.replace(/ +(?= )/g, '').trim().split(' ');
+    }
+    return object;
+  },
+
+});

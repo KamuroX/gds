@@ -1,10 +1,11 @@
-var colors = require('gulp-util').colors;
+var plugin = (module.parent.exports.plugins.devel = {
 
-module.parent.exports.plugins.devel = {
+  baseMerge = true,
 
   dependencies: function() {
     return [
       'options',
+      'colors',
     ];
   },
 
@@ -117,20 +118,20 @@ module.parent.exports.plugins.devel = {
 
   notice: function(string) {
     if (this.options.get('note') > 2 || this.options.get('note') === false || this.options.get('debug')) {
-      console.log(colors.cyan(this.getCurrent('notice')), string);
+      console.log(this.colors.cyan(this.getCurrent('notice')), string);
     }
   },
 
   warn: function(string) {
     if (this.options.get('note') > 1 || this.options.get('note') === false || this.options.get('debug')) {
-      console.log(colors.yellow(this.getCurrent('warn')), string);
+      console.log(this.colors.yellow(this.getCurrent('warn')), string);
     }
   },
 
   error: function(string) {
     if (this.options.get('note') > 0 || this.options.get('note') === false || this.options.get('debug')) {
-      console.log(colors.red(this.getCurrent('error')), string);
+      console.log(this.colors.red(this.getCurrent('error')), string);
     }
   },
 
-};
+});
