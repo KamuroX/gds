@@ -2,7 +2,7 @@
   "options": {
     "note": 5,
     "clear": false,
-    "create": true,
+    "create": 1,
     "dummy-index": {
       "note": 0
     }

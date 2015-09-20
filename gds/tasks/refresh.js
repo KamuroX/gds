@@ -16,8 +16,8 @@ module.exports = {
       var load = plugins.options.get('load');
 
       for (var name in load) {
-        plugins.devel.log('reload "' + name + '"')
-        module.parent.exports.loadJson(name);
+        plugins.devel.log('reload "' + load[name] + '"')
+        module.parent.exports.loadJson(load[name]);
       }
     }
   },

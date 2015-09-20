@@ -1,4 +1,3 @@
-var tasks = module.parent.exports.tasks;
 var plugin = (module.parent.exports.plugins.tasks = {
 
   dependencies: function() {
@@ -8,7 +7,7 @@ var plugin = (module.parent.exports.plugins.tasks = {
   },
 
   get: function() {
-    return tasks;
+    return module.parent.exports.tasks;
   },
 
   globals: {

@@ -15,7 +15,7 @@ module.exports = {
 
     if (plugins.options.get('clear')) {
       plugins.devel.notice('clear all html files');
-      var sitesFiles = Scan.dir('dummy/sites', true);
+      var sitesFiles = plugins.scan.dir('dummy/sites', true);
 
       plugins.scan.walkFile(sitesFiles, function(file, path) {
         if (file.info.extend && file.info.extend == 'html' && file.info.name != 'index') {

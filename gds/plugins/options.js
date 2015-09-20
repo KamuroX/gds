@@ -25,7 +25,9 @@ var plugin = (module.parent.exports.plugins.options = {
     }
 
     for (var task in tasks) {
-      def[task] = tasks[task].def();
+      if (this.isset(tasks[task].def)) {
+        def[task] = tasks[task].def();
+      }
     }
 
     for (var task in def) {

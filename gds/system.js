@@ -23,6 +23,7 @@ var extendPlugins = {
   rename: 'gulp-rename',
   sass: 'gulp-sass',
   autoprefixer: 'gulp-autoprefixer',
+  jseditor: 'gulp-json-editor',
 };
 
 module.exports.base = base;
