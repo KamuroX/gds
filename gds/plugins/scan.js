@@ -1,6 +1,6 @@
 var plugin = (module.parent.exports.plugins.scan = {
 
-  baseMerge = true,
+  baseMerge: true,
 
   dependencies: function() {
     return [

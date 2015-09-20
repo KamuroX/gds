@@ -12,8 +12,8 @@ module.exports = {
   f: function() {
     plugins.devel.current('watch');
 
-    gulp.watch('gulp/jade/**/*.jade', ['jade']);
-    gulp.watch('gulp/sass/*.+(scss|sass)', ['styles']);
+    plugins.gulp.watch('gulp/jade/**/*.jade', ['jade']);
+    plugins.gulp.watch('gulp/sass/*.+(scss|sass)', ['styles']);
   },
 
 };

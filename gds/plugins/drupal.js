@@ -1,5 +1,11 @@
 var plugin = (module.parent.exports.plugins.drupal = {
 
+  dependencies: function() {
+    return [
+      'dummy',
+    ];
+  },
+
   insertStyle: function(mode, modes) {
     var insert = '';
 
@@ -21,6 +27,7 @@ var plugin = (module.parent.exports.plugins.drupal = {
     var vars = {
       drupal: true,
       dummy: false,
+      scripts: this.dummy.scripts(module.parent.exports.jsons.dummy),
     };
 
     output += '- var vars = ' + JSON.stringify(vars) + ';\n';
@@ -28,6 +35,7 @@ var plugin = (module.parent.exports.plugins.drupal = {
     output += 'include ../root\n\n';
     return output;
   },
+
 
   getMID: function(string) {
      return string.toLowerCase().replace(new RegExp('(\\\\s|[^a-z0-9])', 'g'), '_');

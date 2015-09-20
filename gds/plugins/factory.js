@@ -1,11 +1,12 @@
 var plugin = (module.parent.exports.plugins.factory = {
 
-  baseMerge = true,
+  baseMerge: true,
 
   dependencies: function() {
     return [
       'devel',
       'fs',
+      'scan',
     ];
   },
 
@@ -74,8 +75,8 @@ var plugin = (module.parent.exports.plugins.factory = {
     var parts = file.name.split('.');
     fileInfo.name = parts[0];
     fileInfo.extend = parts[parts.length - 1];
-    fileInfo.isNode = fileInfo.name.startsWith('node');
-    fileInfo.isView = fileInfo.name.startsWith('views');
+    fileInfo.isNode = this.startsWith(fileInfo.name, 'node');
+    fileInfo.isView = this.startsWith(fileInfo.name, 'views');
     if (fileInfo.isNode || fileInfo.isView) {
       fileInfo.tpls = fileInfo.name.split('--');
     }

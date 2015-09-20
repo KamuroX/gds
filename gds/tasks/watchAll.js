@@ -18,9 +18,9 @@ module.exports = {
     jsonTasks.push('dummy-index');
     jsonTasks.push('dummy-jade');
 
-    gulp.watch('gulp/sass/*.+(scss|sass)', ['styles']);
-    gulp.watch('dummy/dummy.json', jsonTasks);
-    gulp.watch('gulp/jade/**/*.jade', ['dummy-jade', 'jade']);
+    plugins.gulp.watch('gulp/sass/*.+(scss|sass)', ['styles']);
+    plugins.gulp.watch('dummy/dummy.json', jsonTasks);
+    plugins.gulp.watch('gulp/jade/**/*.jade', ['dummy-jade', 'jade']);
   },
 
 };

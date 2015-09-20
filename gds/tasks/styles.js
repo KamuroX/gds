@@ -22,8 +22,8 @@ module.exports = {
 
         // laod functions for the files
         .pipe(plugins.insert.prepend(plugins.drupal.insertStyle(s.styles.modes[index], s.styles.modes)))
-        .pipe(sass())
-        .pipe(autoprefixer())
+        .pipe(plugins.sass())
+        .pipe(plugins.autoprefixer())
         .pipe(plugins.rename(function(mode) {
           return function(path) {
             path.basename = mode;

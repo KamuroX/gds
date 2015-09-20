@@ -1,6 +1,6 @@
 var plugin = (module.parent.exports.plugins.devel = {
 
-  baseMerge = true,
+  baseMerge: true,
 
   dependencies: function() {
     return [
@@ -105,7 +105,7 @@ var plugin = (module.parent.exports.plugins.devel = {
       for (var index in object) {
         this.logs(object[index], depth + '  ');
       }
-    } else if (isString(object)) {
+    } else if (this.isString(object)) {
       console.log(depth + object);
     }
   },

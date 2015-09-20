@@ -2,7 +2,7 @@ var argv = require('yargs').argv;
 
 var plugin = (module.parent.exports.plugins.options = {
 
-  baseMerge = true,
+  baseMerge: true,
 
   dependencies: function() {
     return [
@@ -15,16 +15,17 @@ var plugin = (module.parent.exports.plugins.options = {
     var input = this.copy(argv);
     var local = {};
     var def = {};
+    var tasks = plugin.tasks.get();
 
     delete input['_'];
     delete input['$0'];
 
-    if (isset(module.parent.exports.jsons.local)) {
+    if (this.isset(module.parent.exports.jsons.local)) {
       local = module.parent.exports.jsons.local.options;
     }
 
-    for (var task in Tasks.tasks) {
-      def[task] = Tasks.tasks[task].def();
+    for (var task in tasks) {
+      def[task] = tasks[task].def();
     }
 
     for (var task in def) {
@@ -32,8 +33,8 @@ var plugin = (module.parent.exports.plugins.options = {
         this.options[task + '-' + op] = this.input(def[task][op]);
       }
     }
-    for (var global in Tasks.globals) {
-      this.options[global] = Tasks.globals[global].def;
+    for (var global in plugin.tasks.globals) {
+      this.options[global] = plugin.tasks.globals[global].def;
     }
     for (var task in local) {
       if (this.isObject(local[task])) {

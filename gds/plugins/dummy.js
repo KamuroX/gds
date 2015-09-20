@@ -1,12 +1,13 @@
 var plugin = (module.parent.exports.plugins.dummy = {
 
-  baseMerge = true,
+  baseMerge: true,
 
   dependencies: function() {
     return [
       'factory',
       'devel',
       'scan',
+      'options',
     ];
   },
 
@@ -14,7 +15,7 @@ var plugin = (module.parent.exports.plugins.dummy = {
     var json = module.parent.exports.jsons.dummy;
 
     var jsonversion = this.factory.version(json.version);
-    var gulpversion = this.factory.version(version);
+    var gulpversion = this.factory.version(module.parent.exports.version);
 
     if (!jsonversion.compare(gulpversion, this.options.get('version'))) {
       this.devel.warn('The version of the json file is not certain compatible!', 'version');
@@ -131,7 +132,7 @@ var plugin = (module.parent.exports.plugins.dummy = {
     data.sites[site].scripts = data.scripts;
     data.sites[site].drupal = false;
     data.sites[site].dummy = true;
-    data.sites[site].version = version;
+    data.sites[site].version = module.parent.exports.version;
     output += '- var vars = ' + JSON.stringify(data.sites[site]) + ';\n';
     return output;
   },

@@ -31,9 +31,9 @@ module.exports = {
   copy: function(object) {
     var c = undefined;
 
-    if (isArray(object)) {
+    if (this.isArray(object)) {
       c = [];
-    } else if (isObject(object)) {
+    } else if (this.isObject(object)) {
       c = {};
     }
     for (var index in object) {
