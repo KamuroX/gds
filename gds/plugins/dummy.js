@@ -31,10 +31,10 @@ var plugin = (module.parent.exports.plugins.dummy = {
       data.sites[site] = {
         regions: {},
       };
-      data.sites[site].site = this.site(json, site);
       for (var region in json.regions) {
         data.sites[site].regions[region] = this.regions(json, region, site);
       }
+      data.sites[site].site = this.site(json, site, data);
       tools.push({
         title: json.sites[site].title || site,
         name: site,
@@ -59,8 +59,20 @@ var plugin = (module.parent.exports.plugins.dummy = {
     return json.sites[site].regions[region];
   },
 
-  site: function(json, site) {
+  site: function(json, site, data) {
     json.site = json.site || {};
+    var classes = json.sites[site].classes || [];
+    this.scan.element(data.sites[site].regions.content, function(element) {
+      var parts = element.split('/');
+
+      parts = parts[parts.length - 1].split('--');
+      if (parts.length == 3 && parts[0] == 'node' && parts[2] == 'full') {
+        if (!plugin.isIntern(classes, 'node-type-' + parts[1])) {
+          classes.push('node-type-' + parts[1]);
+        }
+        return false;
+      }
+    });
 
     return {
       lang: json.sites[site].lang || json.site.lang || 'de',
@@ -69,7 +81,7 @@ var plugin = (module.parent.exports.plugins.dummy = {
       page: json.sites[site].page || json.site.page || 'page/page',
       html: json.sites[site].html || json.site.html || 'html/html',
       name: site,
-      classes: json.sites[site].classes || [],
+      classes: classes,
     };
   },
 
@@ -104,7 +116,7 @@ var plugin = (module.parent.exports.plugins.dummy = {
 
     this.scan.walkFile(this.scan.dir('scripts', this.options.get('scan-scripts')), function(file, path) {
       if (file.info.extend && file.info.extend == 'js') {
-        scripts.drupal[file.name] = ('..' + (path + '/' + file.name).substring('/dummy'.length));
+        scripts.drupal[file.name] = '../..' + path + '/' + file.name;
       }
     });
 

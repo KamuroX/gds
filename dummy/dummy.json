@@ -12,10 +12,10 @@
   },
   "sites": {
     "example-news": {
-      "classes": ["node-type-news", "front"],
+      "classes": ["front"],
       "title": "Test",
       "regions": {
-        "content": "node/node",
+        "content": "node/node--test--full",
         "sidebar": "node/node--test_hu--sidebar_sub"
       }
     },

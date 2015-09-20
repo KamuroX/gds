@@ -13,8 +13,6 @@ mixin html
       +php-print('$scripts')
       +pageScripts
       if dummy
-        script(type="text/javascript", src="../../scripts/DZResponsive.js")
-        script(type="text/javascript", src="../../scripts/test_theme.js")
         link(type="text/css", rel="stylesheet", href="dummy.css")
         link.narrow-style(type="text/css", rel="stylesheet", href="../../styles/narrow.css", media="all and (max-width: 550px)")
         link.medium-style(type="text/css", rel="stylesheet", href="../../styles/medium.css", media="all and (min-width: 551px) and (max-width: 1024px)")

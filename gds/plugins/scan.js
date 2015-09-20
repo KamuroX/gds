@@ -31,13 +31,14 @@ var plugin = (module.parent.exports.plugins.scan = {
   element: function(element, f) {
     if (this.isArray(element)) {
       for (var index in element) {
-        this.element(element[index], f);
+        if (this.element(element[index], f)) return true;
       }
     } else if (this.isObject(element)) {
-      this.element(element.items, f);
+      return this.element(element.items, f);
     } else if (this.isString(element)) {
-      f(element);
+      return f(element);
     }
+    return false;
   },
 
   /**
