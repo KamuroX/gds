@@ -1,1 +1,1 @@
-<div class="node <?php print drupal_html_class($view_mode); ?> <?php print drupal_html_class($type); ?>"><?php print render($title_prefix); ?><h2><?php print $title; ?></h2><?php print render($title_suffix); ?><?php print render($content); ?></div>
+<div class="node">auto generated node</div>

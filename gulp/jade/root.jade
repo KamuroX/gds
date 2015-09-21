@@ -94,6 +94,32 @@ mixin inScope(scope)
 - }
 
 //------------------------------------------------------------------------------------------------------//
+//- functions definitions -//
+//------------------------------------------------------------------------------------------------------//
+
+mixin loop(number)
+  - for (var i = 0; i < number; i++) {
+    block
+  - }
+
+- var loremCount = 0;
+mixin lipsum(amount)
+  - var loremText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+  - var lipsumArray = loremText.split(' ');
+  - var loremIpsum = '';
+  - var wordCount = lipsumArray.length
+  - for (var i = 0; i < amount; i++) {
+      - if(i > 0) {
+        - loremIpsum += ' ';
+      - }
+      - loremIpsum += lipsumArray[(i+loremCount)%wordCount];
+  - }
+  - loremCount += 1;
+  - loremIpsum = loremIpsum.charAt(0).toUpperCase() + loremIpsum.slice(1);
+  =loremIpsum
+  block
+
+//------------------------------------------------------------------------------------------------------//
 //- page definitions -//
 //------------------------------------------------------------------------------------------------------//
 
@@ -107,9 +133,12 @@ mixin pageContent
 mixin pageScripts
   if dummy
     script var vars = !{JSON.stringify(vars)}
-    - for (var index in vars.scripts) {
-      script(src=vars.scripts[index])
+    - for (var index in vars.scripts.dummy) {
+      script(src=vars.scripts.dummy[index])
     - }
+  - for (var index in vars.scripts.drupal) {
+    script(src=vars.scripts.drupal[index])
+  - }
 
 mixin pageTitle
   if dummy
@@ -127,6 +156,41 @@ mixin isRegion(region)
     block
   +php-if("$page['" + region + "']")
     block
+
+//------------------------------------------------------------------------------------------------------//
+//- drupal definitions -//
+//------------------------------------------------------------------------------------------------------//
+
+mixin menu(items)
+  if dummy
+    ul.menu
+      each item in items
+        li.leaf
+          a(href="#")
+            | #{item}
+
+mixin form(id, data)
+  if dummy
+    - data = data || {};
+    - data.classes = data.classes || [];
+    form(class=data.classes.join(' '), id=id, accept-charset="UTF-8")
+      div
+        block
+
+mixin form-input(id, data)
+  if dummy
+    - data = data || {};
+    - data.classes = data.classes || [];
+    .form-item(class=data.classes.join(' '))
+      if (data.label)
+        label(for=id)
+          | #{data.label}
+      input(type=(data.type || 'text'), id=id, size="60", maxlength="128", class="form-" + (data.type || 'text'), placeholder=data.placeholder)
+
+mixin form-submit(id, text)
+  if dummy
+    .form-actions
+      input.form-submit(type='submit', id=id, name=id, value=text)
 
 //------------------------------------------------------------------------------------------------------//
 //- render definitions -//
