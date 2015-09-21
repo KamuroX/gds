@@ -102,12 +102,6 @@ mixin loop(number)
     block
   - }
 
-mixin each(each)
-  - for(var eachKey in each.items) {
-    - each.item = each.items[eachKey];
-    block
-  - }
-
 - var loremCount = 0;
 mixin lipsum(amount)
   - var loremText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
@@ -170,11 +164,33 @@ mixin isRegion(region)
 mixin menu(items)
   if dummy
     ul.menu
-      - var each = {items: items, item: undefined};
-      +each(each)
+      each item in items
         li.leaf
           a(href="#")
-            | #{each.item}
+            | #{item}
+
+mixin form(id, data)
+  if dummy
+    - data = data || {};
+    - data.classes = data.classes || [];
+    form(class=data.classes.join(' '), id=id, accept-charset="UTF-8")
+      div
+        block
+
+mixin form-input(id, data)
+  if dummy
+    - data = data || {};
+    - data.classes = data.classes || [];
+    .form-item(class=data.classes.join(' '))
+      if (data.label)
+        label(for=id)
+          | #{data.label}
+      input(type=(data.type || 'text'), id=id, size="60", maxlength="128", class="form-" + (data.type || 'text'), placeholder=data.placeholder)
+
+mixin form-submit(id, text)
+  if dummy
+    .form-actions
+      input.form-submit(type='submit', id=id, name=id, value=text)
 
 //------------------------------------------------------------------------------------------------------//
 //- render definitions -//

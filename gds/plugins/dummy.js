@@ -62,6 +62,20 @@ var plugin = (module.parent.exports.plugins.dummy = {
   site: function(json, site, data) {
     json.site = json.site || {};
     var classes = json.sites[site].classes || [];
+
+    // @todo make better
+    if (data.sites[site].regions.sidebar_first !== undefined) {
+      if (this.isArray(data.sites[site].regions.sidebar_first)) {
+        if (data.sites[site].regions.sidebar_first.length && !this.isIntern(classes, 'has-sidebar')) {
+          classes.push('has-sidebar');
+        }
+      } else {
+        if (!this.isIntern(classes, 'has-sidebar')) {
+          classes.push('has-sidebar');
+        }
+      }
+    }
+    
     this.scan.element(data.sites[site].regions.content, function(element) {
       var parts = element.split('/');
 
