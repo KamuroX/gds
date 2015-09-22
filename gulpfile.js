@@ -106,3 +106,14 @@ if (plugins.options.get('create') >= 1) {
 
 console.log('END INIT');
 console.log();
+
+plugins.gulp.task('test', function() {
+  console.log('test');
+});
+
+plugins.gulp.task('testw', function() {
+  gulp.watch('gulp/**/*.jade').on('change', function(file) {
+    console.log(file);
+    gulp.start('test');
+  });
+});
