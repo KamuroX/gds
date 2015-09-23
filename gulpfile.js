@@ -31,6 +31,7 @@ function loadJson(name, reload) {
 ////////////////////////////////////////////////////////////////////////////////////
 
 var system = require('./gds/system');
+return;
 var plugins = system.plugins;
 var tasks = system.tasks;
 var base = system.base;

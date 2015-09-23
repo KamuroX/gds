@@ -138,7 +138,7 @@ var plugin = (module.parent.exports.plugins.factory = {
         return this;
       },
 
-      write: function(check, notice) {
+      write: function(check, notice, sync) {
         if (check && plugin.scan.fsExist(this.path)) {
           if (notice) {
             plugin.devel.notice('Try to write "' + this.path + '" but it is already created!');
@@ -151,7 +151,7 @@ var plugin = (module.parent.exports.plugins.factory = {
         var _path = this.path;
 
         plugin.devel.notice('Writing file "' + _path + '" with ' + _lines.length + ' lines');
-        plugin.fs.writeFile(_path, _lines.join('\n'), function(e) {
+        plugin.fs[(sync ? 'writeFileSync' : 'writeFile')](_path, _lines.join('\n'), function(e) {
           if (e) {
             plugin.devel.error('Writing file "' + _path + '" with ' + _lines.length + ' lines');
             return;
