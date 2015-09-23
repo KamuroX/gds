@@ -1,4 +1,4 @@
-var version = '1.2.1.0';
+var version = '1.2.1.0-dev';
 
 
 
