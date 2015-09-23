@@ -197,12 +197,13 @@ mixin form-submit(id, text)
 //------------------------------------------------------------------------------------------------------//
 
 //- invoke an include path as mixin with data
-mixin invoke(include, data)
-  - data = data || {};
-  - include = getInclude(include);
-  - tmp.scope.invoke = include;
-  +inScope(data.scope || tmp.scope.region + '-' + tmp.scope.invoke)
-    +#{include}(data)
+mixin invoke(include, data, force)
+  if dummy || force
+    - data = data || {};
+    - include = getInclude(include);
+    - tmp.scope.invoke = include;
+    +inScope(data.scope || tmp.scope.region + '-' + tmp.scope.invoke)
+      +#{include}(data)
 
 //- render recursive an object definitions
 mixin element(object, data)
