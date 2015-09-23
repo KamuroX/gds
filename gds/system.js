@@ -29,6 +29,25 @@ var extendPlugins = {
 module.exports.base = base;
 module.exports.version = version;
 
+module.exports.gds = {
+
+  registry: {},
+
+  add: function(key, f) {
+    this.registry[key] = this.registry[key] || [];
+    this.registry[key].push(f);
+  },
+
+  invoke: function(key, param) {
+    var back = {};
+    for (var f in (this.registry[key] || [])) {
+      back = f(param, back);
+    }
+    return back;
+  },
+
+};
+
 
 // check and built dependencies of plugins
 function checkDependencies() {
