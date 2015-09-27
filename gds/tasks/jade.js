@@ -1,6 +1,19 @@
-var plugins = module.parent.exports.plugins;
+var gds = module.parent.exports.gds;
+var gulp = undefined;
+var plumber = undefined;
+var insert = undefined;
+var jade = undefined;
+var rename = undefined;
 
 module.exports = {
+
+  init: function() {
+    gulp = gds.get('nodes', 'gulp');
+    plumber = gds.get('nodes', 'plumber');
+    insert = gds.get('nodes', 'insert');
+    jade = gds.get('nodes', 'jade');
+    rename = gds.get('nodes', 'rename');
+  },
 
   name: 'jade',
   description: ['compile drupal jade files'],
@@ -10,43 +23,23 @@ module.exports = {
   },
 
   f: function() {
-    plugins.devel.current('jade');
+    var files = gds.invoke('drupal-jade-files', {path: 'gulp/jade'});
 
-    var jadeTemplates = plugins.scan.dir('gulp/jade', true);
-
-    plugins.scan.walkFile(jadeTemplates, function(file, path) {
-      if (file.info.name != 'mixins' && file.info.name != 'root' && file.info.extend == 'jade') {
-        var gdata = plugins.gulp.src('.' + path + '/' + file.name)
-          .pipe(plugins.plumber(function(file) {
-            return function(e) {
-              plugins.devel.scope('jade');
-              console.log();
-              plugins.devel.error(e.name + ' while compile "' + file.info.name + '"');
-              if (plugins.options.get('note') > 0 || Options.get('debug')) {
-                console.log(e._messageWithDetails());
-              }
-              plugins.devel.debug(e.stack, 'estack');
-              console.log();
-              plugins.devel.scope();
-            };
-          }(file)))
-          .pipe(plugins.insert.prepend(plugins.drupal.prependData()))
-          .pipe(plugins.insert.append('\n+' + file.info.name + '({})\n'));
-
-        if (plugins.options.get('debug-file') === true || plugins.options.get('debug-file') === file.info.name) {
-          gdata.pipe(plugins.intercept(function(file) {
-            console.log('FILE: \n' + file.path);
-            console.log('OLD CONTENT: \n' + file.contents.toString());
-            return file;
-          }));
-        }
-        gdata.pipe(plugins.jade())
-          .pipe(plugins.rename(function(path) {
-            path.extname = '.tpl.php';
-          }))
-          .pipe(plugins.gulp.dest('./templates/' + path.substring('/gulp/jade/'.length)));
-      }
-    });
+    for (var index in files) {
+      gulp.src(files[index].aPath)
+        .pipe(plumber(function(file) {
+          return function(e) {
+            gds.invoke('error', {e: e, task: 'jade', file: file});
+          };
+        })(files[index]))
+        .pipe(insert.prepend(gds.invoke('drupal-jade-prepend', {file: files[index]}).output))
+        .pipe(insert.append(gds.invoke('drupal-jade-append', {file: files[index]}).output))
+        .pipe(jade())
+        .pipe(rename(function(path) {
+          path.extname = '.tpl.php';
+        }))
+        .pipe(gulp.dest('./templates/' + files[index].rPath));
+    }
   },
 
 };

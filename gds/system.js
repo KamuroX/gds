@@ -1,4 +1,23 @@
-var version = '1.2.1.0-dev';
+var version = '1.3.0.0-dev';
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//  global variable definition
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+module.exports.version = version;
+module.exports.nodes = {
+
+  argv: require('yargs').argv,
+  colors: require('gulp-util').colors,
+
+};
+module.exports.gds = require('./gds');
+module.exports.modules = {};
+module.exports.tasks = {};
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//  load node dependencies
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 var nodes = {
   fs: 'fs',
@@ -10,140 +29,55 @@ var nodes = {
   rename: 'gulp-rename',
   sass: 'gulp-sass',
   autoprefixer: 'gulp-autoprefixer',
-  jseditor: 'gulp-json-editor',
-  gutil: 'gulp-util',
-  base: './base',
 };
 
-module.exports.nodes = {};
 for (var node in nodes) {
   module.exports.nodes[node] = require(nodes[node]);
 }
-module.exports.nodes.argv = require('yargs').argv;
-var base = module.exports.nodes.base;
 
-module.exports.out = function(output, color) {
-  switch (color) {
-    case 'g':
-      console.log(module.exports.nodes.gutil.colors.green(output));
-      break;
-    case 'b':
-      console.log(module.exports.nodes.gutil.colors.blue(output));
-      break;
-    case 'y':
-      console.log(module.exports.nodes.gutil.colors.yellow(output));
-      break;
-    case 'r':
-      console.log(module.exports.nodes.gutil.colors.red(output));
-      break;
-    case 'c':
-      console.log(module.exports.nodes.gutil.colors.cyan(output));
-      break;
-    default:
-      console.log(output);
-      break;
+///////////////////////////////////////////////////////////////////////////////////////////////
+//  local variable definition
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+var gds = module.exports.gds;
+var fs = module.exports.nodes.fs;
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//  system start
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+gds.init();
+console.log();
+console.log(gds.out('DZ GULP DUMMY SYSTEM (GDS)', 'c'));
+console.log(gds.out('VERSION: ' + version, 'c'));
+console.log();
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//  load modules
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+var modules = fs.readdirSync('./gds/modules');
+
+for (var index in modules) {
+  var mod = require('./modules/' + modules[index]);
+
+  if (gds.isEnabled('modules', mod.name)) {
+    module.exports.modules[mod.name] = mod;
   }
-};
-
-console.log();
-console.log(module.exports.out('DZ GULP DUMMY SYSTEM (GDS)', 'c'));
-console.log(module.exports.out('VERSION: ' + version, 'c'));
-console.log();
-
-module.exports.version = version;
-
-var gds = {
-
-  command: module.exports.nodes.argv['_'],
-
-  registry: {},
-
-  data: require('./gds.json'),
-
-  add: function(key, f) {
-    this.registry[key] = this.registry[key] || [];
-    this.registry[key].push(f);
-  },
-
-  invoke: function(key, param) {
-    var back = {};
-    for (var f in (this.registry[key] || [])) {
-      back = f(param, back);
-    }
-    return back;
-  },
-
-};
-module.exports.gds = gds;
-
-module.exports.plugins = {};
-
-var modules = module.exports.nodes.fs.readdirSync('./gds/modules');
-var tasks = module.exports.nodes.fs.readdirSync('./gds/tasks');
-
-module.exports.modules = {};
-for (var m in modules) {
-  var mod = require('./modules/' + modules[m]);
-
-  module.exports.modules[mod.name] = mod;
 }
 
-// module.exports.tasks = {};
-// for (var t in tasks) {
-//   var task = require('./tasks/' + tasks[t]);
+///////////////////////////////////////////////////////////////////////////////////////////////
+//  load tasks
+///////////////////////////////////////////////////////////////////////////////////////////////
 
-//   module.exports.modules[task.name] = task;
-// }
+var tasks = fs.readdirSync('./gds/tasks');
 
-module.exports.nodes.gulp.task('gds', function() {
-  if (module.exports.nodes.argv.list) {
-    module.exports.out('List modules:');
-    for (var name in module.exports.modules) {
-      module.exports.out(' - ' + name + (base.isIntern(gds.data.enabled, name) ? ' (enabled)' : ''));
-    }
+for (var t in tasks) {
+  var task = require('./tasks/' + tasks[t]);
+
+  if (gds.isEnabled('tasks', task.name)) {
+    module.exports.modules[task.name] = task;
   }
-  if (module.exports.nodes.argv.en) {
-    var en = module.exports.nodes.argv.en;
-
-    module.exports.out('Enable module "' + en + '"');
-    if (!base.isIntern(gds.data.enabled, en)) {
-      module.exports.nodes.gulp.src('./gds/gds.json')
-        .pipe(module.exports.nodes.jseditor(function(json) {
-          json.enabled = json.enabled || [];
-          json.enabled.push(en);
-          return json;
-        }))
-        .pipe(module.exports.nodes.gulp.dest('./gds/'));
-      module.exports.out('Module "' + en + '" was enabled!', 'g');
-    } else {
-      module.exports.out('Module "' + en + '" is already enabled!', 'r');
-    }
-  }
-  if (module.exports.nodes.argv.dis) {
-    var dis = module.exports.nodes.argv.dis;
-
-    module.exports.out('Disable module "' + dis + '"');
-    if (base.isIntern(gds.data.enabled, dis)) {
-      module.exports.nodes.gulp.src('./gds/gds.json')
-        .pipe(module.exports.nodes.jseditor(function(json) {
-          json.enabled = json.enabled || [];
-          var index = json.enabled.indexOf(dis);
-
-          if (index !== -1) {
-            delete json.enabled[index];
-          }
-          return json;
-        }))
-        .pipe(module.exports.nodes.gulp.dest('./gds/'));
-      module.exports.out('Module "' + dis + '" was disabled!', 'g');
-    } else {
-      module.exports.out('Module "' + dis + '" is not enabled!', 'r');
-    }
-  }
-});
-
-if (gds.command != 'gds') {
-  // regist other tasks
 }
 return;
 

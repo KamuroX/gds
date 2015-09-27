@@ -1,5 +1,69 @@
 module.exports = {
 
+  init: function() {
+    this.data = require('./gds.json');
+
+    this.data.tasks = this.data.tasks || {};
+    this.data.tasks.enabled = this.data.tasks.enabled || [];
+
+    this.data.modules = this.data.modules || {};
+    this.data.modules.enabled = this.data.modules.enabled || [];
+  },
+
+  registry: {},
+
+  isDebug: false,
+
+  data: undefined,
+
+  out: function(output, color) {
+    switch (color) {
+      case 'g':
+        console.log(module.parent.exports.nodes.colors.green(output));
+        break;
+      case 'b':
+        console.log(module.parent.exports.nodes.colors.blue(output));
+        break;
+      case 'y':
+        console.log(module.parent.exports.nodes.colors.yellow(output));
+        break;
+      case 'r':
+        console.log(module.parent.exports.nodes.colors.red(output));
+        break;
+      case 'c':
+        console.log(module.parent.exports.nodes.colors.cyan(output));
+        break;
+      default:
+        console.log(output);
+        break;
+    }
+  },
+
+  isEnabled: function(type, name) {
+    return this.isIntern(this.data[type].enabled, name);
+  },
+
+  get: function(group, object) {
+    if (module.parent.exports.nodes[group] !== undefined) {
+      return module.parent.exports.nodes[group][object];
+    } else if (this.isDebug) {
+      console.log('[FATAL] Group "' + group + '" doe\'s not exist!');
+    }
+  },
+
+  add: function(key, f) {
+    this.registry[key] = this.registry[key] || [];
+    this.registry[key].push(f);
+  },
+
+  invoke: function(key, param) {
+    var back = {};
+    for (var f in (this.registry[key] || [])) {
+      back = f(param, back);
+    }
+    return back;
+  },
+
   isset: function(object) {
     return object !== undefined;
   },
