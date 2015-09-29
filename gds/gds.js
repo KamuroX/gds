@@ -79,10 +79,10 @@ module.exports = {
   },
 
   get: function(group, object) {
-    if (module.parent.exports.nodes[group] !== undefined) {
-      return module.parent.exports.nodes[group][object];
+    if (module.parent.exports[group] !== undefined) {
+      return module.parent.exports[group][object];
     } else {
-      this.sysout('[FATAL] Group "' + group + '" doe\'s not exist!', r);
+      this.sysout('[FATAL] Group "' + group + '" doe\'s not exist!', 'r');
     }
   },
 
@@ -113,8 +113,9 @@ module.exports = {
 
     if (!this.isset(back.cache)) {
       this.sysout('invoke: ' + key);
-      for (var object in (this.registry[key] || [])) {
-        back = object.f(param, back, object.data);
+      var invokes = (this.registry[key] || []);
+      for (var object in invokes) {
+        back = invokes[object].f(param, back, invokes[object].data);
       }
       if (cache) {
         this.setCache('invoke-' + key, back);

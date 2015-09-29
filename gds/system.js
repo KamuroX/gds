@@ -48,8 +48,8 @@ var fs = module.exports.nodes.fs;
 
 gds.init(module.exports.nodes.argv);
 console.log();
-console.log(gds.out('DZ GULP DUMMY SYSTEM (GDS)', 'c'));
-console.log(gds.out('VERSION: ' + version, 'c'));
+gds.out('DZ GULP DUMMY SYSTEM (GDS)', 'c');
+gds.out('VERSION: ' + version, 'c');
 console.log();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,11 +58,12 @@ console.log();
 
 gds.sysout('Load modules');
 var modules = fs.readdirSync('./gds/modules');
+modules = ['options.js'];
 
 for (var index in modules) {
   var mod = require('./modules/' + modules[index]);
 
-  if (gds.isEnabled('modules', mod.name)) {
+  if (gds.isEnabled('modules', mod.name) || true) {
     module.exports.modules[mod.name] = mod;
   }
 }
@@ -73,6 +74,7 @@ for (var index in modules) {
 
 gds.sysout('Load tasks');
 var tasks = fs.readdirSync('./gds/tasks');
+tasks = [];
 
 for (var t in tasks) {
   var task = require('./tasks/' + tasks[t]);
@@ -129,6 +131,8 @@ for (var name in module.exports.tasks) {
     module.exports.tasks[name].init(gds);
   }
 }
+
+console.log(gds.get('modules', 'options').get('test'));
 return;
 
 

@@ -20,8 +20,11 @@ module.exports = {
     };
 
     for (var name in data.argv) {
-
+      if (name !== '_' && name !== '$0') {
+        back.user.options[name] = data.argv[name];
+      }
     }
+    return back;
   },
 
   init: function(gds) {
@@ -58,7 +61,7 @@ module.exports = {
   },
 
   parseinput: function(object) {
-    if (this.isString(object)) {
+    if (this.gds.isString(object)) {
       object = object.replace(/ +(?= )/g, '').trim().split(' ');
     }
     return object;
