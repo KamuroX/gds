@@ -1,99 +1,75 @@
-var argv = require('yargs').argv;
+module.exports = {
 
-var plugin = (module.parent.exports.plugins.options = {
-
-  baseMerge: true,
-
-  dependencies: function() {
-    return [
-      'tasks',
-      'devel',
-    ];
-  },
-
-  init: function() {
-    var input = this.copy(argv);
-    var local = {};
-    var def = {};
-    var tasks = plugin.tasks.get();
-
-    delete input['_'];
-    delete input['$0'];
-
-    if (this.isset(module.parent.exports.jsons.local)) {
-      local = module.parent.exports.jsons.local.options;
-    }
-
-    for (var task in tasks) {
-      if (this.isset(tasks[task].def)) {
-        def[task] = tasks[task].def();
-      }
-    }
-
-    for (var task in def) {
-      for (var op in def[task]) {
-        this.options[task + '-' + op] = this.input(def[task][op]);
-      }
-    }
-    for (var global in plugin.tasks.globals) {
-      this.options[global] = plugin.tasks.globals[global].def;
-    }
-    for (var task in local) {
-      if (this.isObject(local[task])) {
-        for (var op in local[task]) {
-          this.options['local-' + task + '-' + op] = this.input(local[task][op]);
-        }
-      } else {
-        this.options['local-' + task] = this.input(local[task]);
-      }
-    }
-    for (var op in input) {
-      this.options['user-' + op] = this.input(input[op]);
-    }
-
-    this.devel.debug(this.options, 'options');
-  },
-
+  name: 'options',
   options: {},
+  groups: [],
+  gds: undefined,
+  argv: undefined,
 
-  searchings: function(name) {
-    return [
-      'user-' + this.devel.current() + '-' + name,
-      'user-' + name,
-      'local-' + this.devel.current() + '-' + name,
-      'local-' + name,
-      this.devel.current() + '-' + name,
-      name,
-    ];
+  boot: function(gds) {
+    this.gds = gds;
+    this.argv = gds.get('nodes', 'argv');
+
+    gds.add('options-sysoptions', this.optionsSysoptions, this);
   },
 
-  is: function(name) {
-    var searching = this.searchings(name);
+  optionsSysoptions: function(param, back, data) {
+    back.user = {
+      weight: -1000,
+      options: {},
+    };
 
-    for (var search in searching) {
-      if (this.options[searching[search]] !== undefined) {
-        return true;
+    for (var name in data.argv) {
+
+    }
+  },
+
+  init: function(gds) {
+    var sysoptions = gds.invoke('options-sysoptions');
+
+    for (var group in sysoptions) {
+      this.groups.push({
+        name: group,
+        weight: sysoptions[group].weight || 0,
+      });
+
+      for (var option in sysoptions[group].options) {
+        if (gds.isObject(sysoptions[group].options[option])) {
+          for (var taskoption in sysoptions[group].options[option]) {
+            this.options[group + '-' + option + '-' + taskoption] = this.parseinput(sysoptions[group].options[option][taskoption]);
+          }
+        } else {
+          this.options[group + '-' + option] = this.parseinput(sysoptions[group].options[option]);
+        }
       }
     }
-    return false;
+
+    this.groups = gds.sortWeight(this.groups);
   },
 
-  get: function(name) {
-    var searching = this.searchings(name);
+  searchingKeys: function(name) {
+    var searchings = [];
 
-    for (var search in searching) {
-      if (this.options[searching[search]] !== undefined) {
-        return this.options[searching[search]];
-      }
+    for (var i = 0; i < this.groups.length; i++) {
+      searchings.push(this.groups[i].name + '-' + this.gds.current + '-' + name);
+      searchings.push(this.groups[i].name + '-' + name);
     }
-    return false;
+    return searchings;
   },
 
-  input: function(object) {
+  parseinput: function(object) {
     if (this.isString(object)) {
       object = object.replace(/ +(?= )/g, '').trim().split(' ');
     }
     return object;
   },
 
-});
+  is: function(name) {
+    return this.gds.searchFor(this.options, this.searchingKeys(name)) !== false;
+  },
+
+  get: function(name) {
+    return this.gds.searchFor(this.options, this.searchingKeys(name));
+  },
+
+};

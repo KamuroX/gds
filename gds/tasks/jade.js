@@ -1,4 +1,4 @@
-var gds = module.parent.exports.gds;
+var gds = undefined;
 var gulp = undefined;
 var plumber = undefined;
 var insert = undefined;
@@ -7,7 +7,8 @@ var rename = undefined;
 
 module.exports = {
 
-  init: function() {
+  init: function(gds) {
+    gds = gds;
     gulp = gds.get('nodes', 'gulp');
     plumber = gds.get('nodes', 'plumber');
     insert = gds.get('nodes', 'insert');

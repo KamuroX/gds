@@ -1,6 +1,12 @@
 module.exports = {
 
-  init: function() {
+  registry: {},
+  isDebug: false,
+  data: undefined,
+  cache: {},
+  current: 'init',
+
+  init: function(argv) {
     this.data = require('./gds.json');
 
     this.data.tasks = this.data.tasks || {};
@@ -8,13 +14,9 @@ module.exports = {
 
     this.data.modules = this.data.modules || {};
     this.data.modules.enabled = this.data.modules.enabled || [];
+
+    this.isDebug = argv['debug'];
   },
-
-  registry: {},
-
-  isDebug: false,
-
-  data: undefined,
 
   out: function(output, color) {
     switch (color) {
@@ -39,6 +41,39 @@ module.exports = {
     }
   },
 
+  sysout: function(output, color) {
+    if (this.isDebug) {
+      this.out('[SYSTEM] ' + output, color);
+    }
+  },
+
+  sortIn: function(object, sort) {
+    var array = [];
+
+    for (var i = 0; i < sort.length; i++) {
+      array.push(object[sort[i]]);
+    }
+    return array;
+  },
+
+  sortWeight: function(array) {
+    return array.sort(function(a, b) {
+      var aweight = a.weight || 0;
+      var bweight = b.weight || 0;
+
+      if (aweight < bweight) return -1;
+      if (aweight > bweight) return 1;
+      if (aweight == bweight) return 0;
+    });
+  },
+
+  searchFor: function(object, keys) {
+    for (var i = 0; i < keys.length; i++) {
+      if (this.isset(object[keys[i]])) return object[keys[i]];
+    }
+    return false;
+  },
+
   isEnabled: function(type, name) {
     return this.isIntern(this.data[type].enabled, name);
   },
@@ -46,22 +81,46 @@ module.exports = {
   get: function(group, object) {
     if (module.parent.exports.nodes[group] !== undefined) {
       return module.parent.exports.nodes[group][object];
-    } else if (this.isDebug) {
-      console.log('[FATAL] Group "' + group + '" doe\'s not exist!');
+    } else {
+      this.sysout('[FATAL] Group "' + group + '" doe\'s not exist!', r);
     }
   },
 
-  add: function(key, f) {
+  add: function(key, f, data) {
     this.registry[key] = this.registry[key] || [];
-    this.registry[key].push(f);
+    this.registry[key].push({
+      f: f,
+      data: data,
+    });
   },
 
-  invoke: function(key, param) {
-    var back = {};
-    for (var f in (this.registry[key] || [])) {
-      back = f(param, back);
+  getCache: function(key) {
+    if (this.isset(this.cache[key])) {
+      return {cache: this.cache[key], key: key};
+    } else {
+      return false;
     }
-    return back;
+  },
+
+  setCache: function(key, value) {
+    this.cache[key] = value;
+    return {cache: value, key: key};
+  },
+
+  invoke: function(key, param, cache) {
+    cache = (cache === undefined ? true : cache);
+    var back = this.getCache('invoke-' + key) && cache || {};
+
+    if (!this.isset(back.cache)) {
+      this.sysout('invoke: ' + key);
+      for (var object in (this.registry[key] || [])) {
+        back = object.f(param, back, object.data);
+      }
+      if (cache) {
+        this.setCache('invoke-' + key, back);
+      }
+    }
+    return back.cache || back;
   },
 
   isset: function(object) {
