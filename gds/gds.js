@@ -136,7 +136,7 @@ module.exports = {
 
     if (!this.isset(back.cache)) {
       this.sysout('invoke: ' + key);
-      var invokes = sortWeight(this.registry[key] || []);
+      var invokes = this.sortWeight(this.registry[key] || []);
       for (var object in invokes) {
         back = invokes[object].f(param, back, invokes[object].data);
       }
