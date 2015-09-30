@@ -63,7 +63,7 @@ modules = ['options.js', 'devel.js'];
 for (var index in modules) {
   var mod = require('./modules/' + modules[index]);
 
-  if (gds.isEnabled('modules', mod.name) || true) {
+  if (gds.isEnabled('modules', mod.name)) {
     module.exports.modules[mod.name] = mod;
   }
 }

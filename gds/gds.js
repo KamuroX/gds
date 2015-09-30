@@ -18,8 +18,11 @@ module.exports = {
     this.isDebug = argv['debug'];
   },
 
-  load: function() {
-
+  load: function(name, reload) {
+    if (reload) {
+      delete require.cache[require.resolve(name)];
+    }
+    return require(name);
   },
 
   out: function(output, color, after) {
@@ -100,11 +103,12 @@ module.exports = {
     }
   },
 
-  add: function(key, f, data) {
+  add: function(key, f, data, weight) {
     this.registry[key] = this.registry[key] || [];
     this.registry[key].push({
       f: f,
       data: data,
+      weight: weight || 0,
     });
   },
 
@@ -132,7 +136,7 @@ module.exports = {
 
     if (!this.isset(back.cache)) {
       this.sysout('invoke: ' + key);
-      var invokes = (this.registry[key] || []);
+      var invokes = sortWeight(this.registry[key] || []);
       for (var object in invokes) {
         back = invokes[object].f(param, back, invokes[object].data);
       }

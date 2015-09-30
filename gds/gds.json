@@ -1,5 +1,8 @@
 {
-  "enabled": [
-    "devel"
-  ]
+  "modules": {
+    "enabled": [
+      "options",
+      "devel"
+    ]
+  }
 }
