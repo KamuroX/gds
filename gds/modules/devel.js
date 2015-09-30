@@ -1,12 +1,14 @@
-var plugin = (module.parent.exports.plugins.devel = {
+module.exports = {
 
-  baseMerge: true,
+  name: 'devel',
+  description: ['provides developer functions'],
+  gds: undefined,
+  options: undefined,
 
-  dependencies: function() {
-    return [
-      'options',
-      'colors',
-    ];
+  boot: function(gds) {
+    this.gds = gds;
+    this.options = gds.get('modules', 'options');
+    gds.checkDepend(this.name, 'modules', ['options']);
   },
 
   /**
@@ -56,82 +58,48 @@ var plugin = (module.parent.exports.plugins.devel = {
     return 'unknown';
   },
 
-  varCurrent: 'init',
-  varScope: undefined,
-
-  current: function(current) {
-    if (current) {
-      this.varCurrent = current;
+  info: function(type) {
+    if (type) {
+      return '[' + type.toUpperCase() + '->' + this.gds.current().toUpperCase() + ']';
     }
-    return this.varCurrent;
+    return '[' + this.gds.current().toUpperCase() + ']';
   },
 
-  scope: function(scope) {
-    if (!this.isset(scope)) {
-      this.varCurrent = this.varScope;
-      this.varScope = undefined;
-    } else {
-      if (!this.isset(this.varScope)) {
-        this.varScope = this.varCurrent;
-      }
-      this.varCurrent = scope;
-    }
-  },
+  logs: function(object, depth, force) {
+    if ((this.options && this.options.get('note') === false) && !force && !this.gds.isDebug) return;
+    depth = depth || '';
 
-  getCurrent: function(before) {
-    if (before) {
-      return '[' + before.toUpperCase() + '->' + this.current().toUpperCase() + ']';
-    }
-    return '[' + this.current().toUpperCase() + ']';
-  },
-
-  isDebug: function(type) {
-    var op = this.options.get('debug');
-    return op === true || op === type;
-  },
-
-  debug: function(log, type) {
-    if (this.isDebug(type)) {
-      console.log('Task: ', this.current());
-      console.log(log);
-    }
-  },
-
-  logs: function(object, depth) {
-    if (this.options.get('note') === false) return;
-    depth = this.define(depth, '');
-
-    if (this.isArray(object)) {
+    if (this.gds.isArray(object)) {
       for (var index in object) {
         this.logs(object[index], depth + '  ');
       }
-    } else if (this.isString(object)) {
+    } else if (this.gds.isString(object)) {
       console.log(depth + object);
     }
   },
 
   log: function(string) {
-    if (this.options.get('note') !== 0 || this.options.get('debug')) {
+    if ((this.options && this.options.get('note') !== 0) || this.gds.isDebug) {
       console.log(this.getCurrent(), string);
     }
   },
 
   notice: function(string) {
-    if (this.options.get('note') > 2 || this.options.get('note') === false || this.options.get('debug')) {
-      console.log(this.colors.cyan(this.getCurrent('notice')), string);
+    if ((this.options && this.options.get('note') > 2) || this.gds.isDebug) {
+      this.gds.out(this.info('notice'), 'b', string);
     }
   },
 
   warn: function(string) {
-    if (this.options.get('note') > 1 || this.options.get('note') === false || this.options.get('debug')) {
-      console.log(this.colors.yellow(this.getCurrent('warn')), string);
+    if ((this.options && this.options.get('note') > 1) || this.gds.isDebug) {
+      this.gds.out(this.info('warn'), 'y', string);
     }
   },
 
   error: function(string) {
-    if (this.options.get('note') > 0 || this.options.get('note') === false || this.options.get('debug')) {
-      console.log(this.colors.red(this.getCurrent('error')), string);
+    if ((this.options && this.options.get('note') > 0) || this.gds.isDebug) {
+      this.gds.out(this.info('error'), 'r', string);
     }
   },
 
-});
+};

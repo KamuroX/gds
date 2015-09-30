@@ -4,7 +4,7 @@ module.exports = {
   isDebug: false,
   data: undefined,
   cache: {},
-  current: 'init',
+  varCurrent: 'init',
 
   init: function(argv) {
     this.data = require('./gds.json');
@@ -18,26 +18,40 @@ module.exports = {
     this.isDebug = argv['debug'];
   },
 
-  out: function(output, color) {
+  load: function() {
+
+  },
+
+  out: function(output, color, after) {
+    after = after || '';
     switch (color) {
       case 'g':
-        console.log(module.parent.exports.nodes.colors.green(output));
+        console.log(module.parent.exports.nodes.colors.green(output), after);
         break;
       case 'b':
-        console.log(module.parent.exports.nodes.colors.blue(output));
+        console.log(module.parent.exports.nodes.colors.blue(output), after);
         break;
       case 'y':
-        console.log(module.parent.exports.nodes.colors.yellow(output));
+        console.log(module.parent.exports.nodes.colors.yellow(output), after);
         break;
       case 'r':
-        console.log(module.parent.exports.nodes.colors.red(output));
+        console.log(module.parent.exports.nodes.colors.red(output), after);
         break;
       case 'c':
-        console.log(module.parent.exports.nodes.colors.cyan(output));
+        console.log(module.parent.exports.nodes.colors.cyan(output), after);
         break;
       default:
-        console.log(output);
+        console.log(output, after);
         break;
+    }
+  },
+
+  checkDepend: function(name, type, dependencies) {
+    if (!this.isDebug) return;
+    for (var i = 0; i < dependencies.length; i++) {
+      if (!this.isEnabled(type, dependencies[i])) {
+        this.out('[SYSTEM:WARN] "' + name + '" miss ' + type + ' "' + dependencies[i] + '"', 'y');
+      }
     }
   },
 
@@ -105,6 +119,11 @@ module.exports = {
   setCache: function(key, value) {
     this.cache[key] = value;
     return {cache: value, key: key};
+  },
+
+  current: function(current) {
+    if (current) this.varCurrent = current;
+    return this.varCurrent;
   },
 
   invoke: function(key, param, cache) {

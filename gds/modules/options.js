@@ -1,6 +1,7 @@
 module.exports = {
 
   name: 'options',
+  description: ['provides command options'],
   options: {},
   groups: [],
   gds: undefined,
@@ -13,21 +14,7 @@ module.exports = {
     gds.add('options-sysoptions', this.optionsSysoptions, this);
   },
 
-  optionsSysoptions: function(param, back, data) {
-    back.user = {
-      weight: -1000,
-      options: {},
-    };
-
-    for (var name in data.argv) {
-      if (name !== '_' && name !== '$0') {
-        back.user.options[name] = data.argv[name];
-      }
-    }
-    return back;
-  },
-
-  init: function(gds) {
+  root: function(gds) {
     var sysoptions = gds.invoke('options-sysoptions');
 
     for (var group in sysoptions) {
@@ -48,6 +35,20 @@ module.exports = {
     }
 
     this.groups = gds.sortWeight(this.groups);
+  },
+
+  optionsSysoptions: function(param, back, data) {
+    back.user = {
+      weight: -1000,
+      options: {},
+    };
+
+    for (var name in data.argv) {
+      if (name !== '_' && name !== '$0') {
+        back.user.options[name] = data.argv[name];
+      }
+    }
+    return back;
   },
 
   searchingKeys: function(name) {

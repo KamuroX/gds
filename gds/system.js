@@ -56,9 +56,9 @@ console.log();
 //  load modules
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-gds.sysout('Load modules');
+gds.sysout('LOAD MODULES');
 var modules = fs.readdirSync('./gds/modules');
-modules = ['options.js'];
+modules = ['options.js', 'devel.js'];
 
 for (var index in modules) {
   var mod = require('./modules/' + modules[index]);
@@ -72,7 +72,7 @@ for (var index in modules) {
 //  load tasks
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-gds.sysout('Load tasks');
+gds.sysout('LOAD TASKS');
 var tasks = fs.readdirSync('./gds/tasks');
 tasks = [];
 
@@ -88,7 +88,7 @@ for (var t in tasks) {
 //  boot modules
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-gds.sysout('Boot modules');
+gds.sysout('BOOT MODULES');
 for (var name in module.exports.modules) {
   if (gds.isset(module.exports.modules[name].boot)) {
     gds.sysout('BOOT: ' + name);
@@ -97,14 +97,14 @@ for (var name in module.exports.modules) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-//  boot tasks
+//  root modules
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-gds.sysout('Boot tasks');
-for (var name in module.exports.tasks) {
-  if (gds.isset(module.exports.tasks[name].boot)) {
-    gds.sysout('BOOT: ' + name);
-    module.exports.tasks[name].boot(gds);
+gds.sysout('ROOT MODULES');
+for (var name in module.exports.modules) {
+  if (gds.isset(module.exports.modules[name].root)) {
+    gds.sysout('ROOT: ' + name);
+    module.exports.modules[name].root(gds);
   }
 }
 
@@ -112,7 +112,7 @@ for (var name in module.exports.tasks) {
 //  init modules
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-gds.sysout('Init modules');
+gds.sysout('INIT MODULES');
 for (var name in module.exports.modules) {
   if (gds.isset(module.exports.modules[name].init)) {
     gds.sysout('INIT: ' + name);
@@ -121,10 +121,22 @@ for (var name in module.exports.modules) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
+//  boot tasks
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+gds.sysout('BOOT TASKS');
+for (var name in module.exports.tasks) {
+  if (gds.isset(module.exports.tasks[name].boot)) {
+    gds.sysout('BOOT: ' + name);
+    module.exports.tasks[name].boot(gds);
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
 //  init tasks
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-gds.sysout('Init tasks');
+gds.sysout('INIT TASKS');
 for (var name in module.exports.tasks) {
   if (gds.isset(module.exports.tasks[name].init)) {
     gds.sysout('INIT: ' + name);
@@ -132,7 +144,6 @@ for (var name in module.exports.tasks) {
   }
 }
 
-console.log(gds.get('modules', 'options').get('test'));
 return;
 
 
