@@ -1,3 +1,6 @@
+body {
+  font-size: 100%;
+}
 #dummy-tool {
   position: fixed;
   top: 10px;
